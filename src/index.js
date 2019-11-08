@@ -11,7 +11,13 @@ import { createUploadLink } from "apollo-upload-client";
 import { ApolloProvider } from "@apollo/react-hooks";
 
 // Create apollo client
-const link = createUploadLink({ uri: "http://localhost:8000/graphql" });
+const token = localStorage.getItem("token");
+const link = createUploadLink({
+  uri: "http://localhost:8000/graphql",
+  headers: {
+    "x-token": token
+  }
+});
 const cache = new InMemoryCache();
 const client = new ApolloClient({ link, cache });
 

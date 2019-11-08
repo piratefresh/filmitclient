@@ -1,7 +1,10 @@
 import React from "react";
 import styled from "styled-components";
-import { useQuery } from "@apollo/react-hooks";
+import { useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
+import { useFormik } from "formik";
+
+import { Input } from "../components/forum/Input";
 
 const Container = styled.div`
   display: flex;
@@ -32,7 +35,31 @@ const LoginContainer = styled.main`
   }
 `;
 
+const SIGNIN_MUTATION = gql`
+  mutation signIn($login: String!, $password: String!) {
+    signIn(login: $login, password: $password) {
+      token
+    }
+  }
+`;
+
 function Login() {
+  const [signIn, { loading }] = useMutation(SIGNIN_MUTATION, {
+    onCompleted({ signIn }) {
+      localStorage.setItem("token", signIn.token);
+    }
+  });
+  const formik = useFormik({
+    initialValues: {
+      login: "",
+      password: ""
+    },
+    onSubmit: (values, { setSubmitting }) => {
+      alert(JSON.stringify(values, null, 2));
+      signIn({ variables: values });
+    }
+  });
+  if (loading) return <p>Loading ...</p>;
   return (
     <Container>
       <VideoContainer>
@@ -45,7 +72,22 @@ function Login() {
       </VideoContainer>
       <LoginContainer>
         <h2>Login</h2>
-        <input></input>
+        <form onSubmit={formik.handleSubmit}>
+          <Input
+            name="login"
+            placeholder="Email"
+            defaultValue="test"
+            onChange={formik.handleChange}
+            value={formik.values.login}
+          />
+          <Input
+            name="password"
+            placeholder="Password"
+            onChange={formik.handleChange}
+            value={formik.values.password}
+          />
+          <input type="submit" />
+        </form>
       </LoginContainer>
     </Container>
   );
