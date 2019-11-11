@@ -56,7 +56,6 @@ export const Input = ({ name, placeholder, isRequired, value, onChange }) => {
       inputEl.current.focus();
     }
   };
-  console.log();
   return (
     <InputContainer>
       <LabelStyled

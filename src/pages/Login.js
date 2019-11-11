@@ -1,10 +1,11 @@
 import React from "react";
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 import { useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import { useFormik } from "formik";
 
 import { Input } from "../components/forum/Input";
+import SignOutButton from "../components/SignOut";
 
 const Container = styled.div`
   display: flex;
@@ -29,16 +30,24 @@ const LoginContainer = styled.main`
   min-height: 100vh;
   justify-content: center;
   align-items: center;
-
+  .error-message {
+    color: red;
+  }
   h2 {
     font-size: 36px;
   }
+  ${props =>
+    props.status &&
+    css`
+      border: 1px solid red;
+    `}
 `;
 
 const SIGNIN_MUTATION = gql`
   mutation signIn($login: String!, $password: String!) {
     signIn(login: $login, password: $password) {
       token
+      refreshToken
     }
   }
 `;
@@ -47,6 +56,7 @@ function Login() {
   const [signIn, { loading }] = useMutation(SIGNIN_MUTATION, {
     onCompleted({ signIn }) {
       localStorage.setItem("token", signIn.token);
+      localStorage.setItem("refreshToken", signIn.refreshToken);
     }
   });
   const formik = useFormik({
@@ -54,9 +64,13 @@ function Login() {
       login: "",
       password: ""
     },
-    onSubmit: (values, { setSubmitting }) => {
-      alert(JSON.stringify(values, null, 2));
-      signIn({ variables: values });
+    onSubmit: async (values, { setSubmitting, setStatus }) => {
+      try {
+        const response = await signIn({ variables: values });
+        console.log(response);
+      } catch (err) {
+        setStatus(err.graphQLErrors[0].message);
+      }
     }
   });
   if (loading) return <p>Loading ...</p>;
@@ -70,7 +84,10 @@ function Login() {
           src="https://media-waterdeep.cursecdn.com/login-sidebar-video/sidebar_video_2.webm"
         ></video>
       </VideoContainer>
-      <LoginContainer>
+      <LoginContainer status={formik.status}>
+        {!!formik.status && (
+          <span className="error-message">{formik.status}</span>
+        )}
         <h2>Login</h2>
         <form onSubmit={formik.handleSubmit}>
           <Input
@@ -89,6 +106,7 @@ function Login() {
           <input type="submit" />
         </form>
       </LoginContainer>
+      <SignOutButton>Sign Out</SignOutButton>
     </Container>
   );
 }
