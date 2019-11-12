@@ -8,11 +8,13 @@ import * as serviceWorker from "./serviceWorker";
 import { ApolloClient } from "apollo-client";
 import { InMemoryCache } from "apollo-cache-inmemory";
 import { ApolloLink, split } from "apollo-link";
-import { getMainDefinition } from "apollo-utilities";
 import { onError } from "apollo-link-error";
 import { createHttpLink } from "apollo-link-http";
+import { TokenRefreshLink } from "apollo-link-token-refresh";
 import { ApolloProvider } from "@apollo/react-hooks";
 import { signOut } from "./components/SignOut";
+import { getAccessToken, setAccessToken } from "./accessToken";
+import jwtDecode from "jwt-decode";
 
 // Create apollo client
 const httpLink = createHttpLink({
@@ -22,11 +24,13 @@ const httpLink = createHttpLink({
 
 const authLink = new ApolloLink((operation, forward) => {
   operation.setContext(({ headers = {} }) => {
-    const token = localStorage.getItem("token");
-    const refreshToken = localStorage.getItem("refreshToken");
-
-    if (token) {
-      headers = { ...headers, "x-token": token, "refresh-token": refreshToken };
+    const accessToken = getAccessToken();
+    console.log(accessToken);
+    if (accessToken) {
+      headers = {
+        ...headers,
+        authorization: accessToken ? `Bearer ${accessToken}` : ""
+      };
     }
 
     return { headers };
@@ -55,7 +59,42 @@ const errorLink = onError(({ graphQLErrors, networkError }) => {
   }
 });
 
-const link = ApolloLink.from([authLink, errorLink, httpLink]);
+const tokenRefreshLink = new TokenRefreshLink({
+  accessTokenField: "accessToken",
+  isTokenValidOrUndefined: () => {
+    const token = getAccessToken();
+
+    if (!token) {
+      return true;
+    }
+
+    try {
+      const { exp } = jwtDecode(token);
+      if (Date.now() >= exp * 1000) {
+        return false;
+      } else {
+        return true;
+      }
+    } catch {
+      return false;
+    }
+  },
+  fetchAccessToken: () => {
+    return fetch("http://localhost:3000/refresh_token", {
+      method: "POST",
+      credentials: "include"
+    });
+  },
+  handleFetch: accessToken => {
+    setAccessToken(accessToken);
+  },
+  handleError: err => {
+    console.warn("Your refresh token is invalid. Try to relogin");
+    console.error(err);
+  }
+});
+
+const link = ApolloLink.from([authLink, tokenRefreshLink, errorLink, httpLink]);
 const cache = new InMemoryCache();
 const client = new ApolloClient({ link, cache });
 

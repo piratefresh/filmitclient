@@ -7,6 +7,10 @@ import { AppRoute } from "./AppRoute";
 import MainLayout from "./components/layouts/MainLayout";
 import LoginLayout from "./components/layouts/LoginLayout";
 import withSession from "./session/withSession";
+import { setAccessToken } from "./accessToken";
+import Cookies from "js-cookie";
+import { useMutation } from "@apollo/react-hooks";
+import { SIGNIN_GOOGLE_MUTATION } from "./graphql/mutations";
 
 import Home from "./pages/Home";
 import Feed from "./pages/Feed";
@@ -21,6 +25,44 @@ const GlobalStyle = createGlobalStyle`
 `;
 
 function App() {
+  const [loading, setLoading] = React.useState(true);
+  const [authGoogle] = useMutation(SIGNIN_GOOGLE_MUTATION, {
+    onCompleted({ authGoogle }) {
+      if (authGoogle.data) {
+        setAccessToken(authGoogle.data.accessToken);
+      }
+    }
+  });
+
+  const googleUser = Cookies.get("gtoken");
+  console.log(googleUser);
+
+  React.useEffect(() => {
+    if (googleUser) {
+      authGoogle({
+        variables: { input: { accessToken: googleUser } }
+      });
+    }
+    setLoading(false);
+  }, []);
+
+  React.useEffect(() => {
+    fetch("http://localhost:3000/refresh_token", {
+      method: "POST",
+      credentials: "include"
+    }).then(async x => {
+      console.log(x);
+      const { accessToken } = await x.json();
+      console.log(accessToken);
+      setAccessToken(accessToken);
+      setLoading(false);
+    });
+  }, []);
+
+  if (loading) {
+    return <div>loading...</div>;
+  }
+
   return (
     <div className="App">
       <GlobalStyle />
@@ -40,11 +82,11 @@ function App() {
             component={Account}
             layout={MainLayout}
           />
-          {/* <AppRoute component={NotFound} /> */}
+          <AppRoute component={NotFound} />
         </Switch>
       </Router>
     </div>
   );
 }
 
-export default withSession(App);
+export default App;

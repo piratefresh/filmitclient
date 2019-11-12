@@ -1,11 +1,91 @@
 import React from "react";
 import styled, { css } from "styled-components";
 import { useMutation } from "@apollo/react-hooks";
-import gql from "graphql-tag";
 import { useFormik } from "formik";
+import { setAccessToken } from "../accessToken";
 
 import { Input } from "../components/forum/Input";
-import SignOutButton from "../components/SignOut";
+import GoogleSignInBtn from "../components/buttons/GoogleBtn";
+import { SIGNIN_MUTATION } from "../graphql/mutations";
+import { GET_ME } from "../graphql/queries";
+
+function Login({ history }) {
+  const [signIn, { loading }] = useMutation(SIGNIN_MUTATION, {
+    onCompleted({ signIn }) {
+      if (signIn.data) {
+        setAccessToken(signIn.data.accessToken);
+      }
+    }
+  });
+  const formik = useFormik({
+    initialValues: {
+      login: "",
+      password: ""
+    },
+    onSubmit: async ({ login, password }, { setSubmitting, setStatus }) => {
+      const response = await signIn({
+        variables: { login, password },
+        update: (store, { data }) => {
+          store.writeQuery({
+            query: GET_ME,
+            data: {
+              me: data
+            }
+          });
+        }
+      });
+      console.log(response);
+
+      if (response && response.data) {
+        setAccessToken(response.data.signIn.accessToken);
+      }
+
+      history.push("/");
+    }
+  });
+  if (loading) return <p>Loading ...</p>;
+  return (
+    <Container>
+      <VideoContainer>
+        <video
+          autoplay=""
+          muted=""
+          loop=""
+          src="https://media-waterdeep.cursecdn.com/login-sidebar-video/sidebar_video_2.webm"
+        ></video>
+      </VideoContainer>
+      <LoginContainer status={formik.status}>
+        <div className="login-wrapper">
+          {!!formik.status && (
+            <span className="error-message">{formik.status}</span>
+          )}
+          <h2>Login</h2>
+          <form onSubmit={formik.handleSubmit}>
+            <Input
+              name="login"
+              placeholder="Email"
+              defaultValue="test"
+              onChange={formik.handleChange}
+              value={formik.values.login}
+            />
+            <Input
+              name="password"
+              placeholder="Password"
+              onChange={formik.handleChange}
+              value={formik.values.password}
+            />
+            <input type="submit" />
+          </form>
+          <div className="button-container">
+            <a href="/google">
+              <GoogleSignInBtn />
+            </a>
+          </div>
+        </div>
+      </LoginContainer>
+    </Container>
+  );
+}
 
 const Container = styled.div`
   display: flex;
@@ -30,6 +110,16 @@ const LoginContainer = styled.main`
   min-height: 100vh;
   justify-content: center;
   align-items: center;
+
+  .login-wrapper {
+    max-width: 580px;
+    width: 100%;
+    .button-container {
+      width: 100%;
+      max-width: 350px;
+      margin: 0 auto;
+    }
+  }
   .error-message {
     color: red;
   }
@@ -42,73 +132,5 @@ const LoginContainer = styled.main`
       border: 1px solid red;
     `}
 `;
-
-const SIGNIN_MUTATION = gql`
-  mutation signIn($login: String!, $password: String!) {
-    signIn(login: $login, password: $password) {
-      token
-      refreshToken
-    }
-  }
-`;
-
-function Login() {
-  const [signIn, { loading }] = useMutation(SIGNIN_MUTATION, {
-    onCompleted({ signIn }) {
-      localStorage.setItem("token", signIn.token);
-      localStorage.setItem("refreshToken", signIn.refreshToken);
-    }
-  });
-  const formik = useFormik({
-    initialValues: {
-      login: "",
-      password: ""
-    },
-    onSubmit: async (values, { setSubmitting, setStatus }) => {
-      try {
-        const response = await signIn({ variables: values });
-        console.log(response);
-      } catch (err) {
-        setStatus(err.graphQLErrors[0].message);
-      }
-    }
-  });
-  if (loading) return <p>Loading ...</p>;
-  return (
-    <Container>
-      <VideoContainer>
-        <video
-          autoplay=""
-          muted=""
-          loop=""
-          src="https://media-waterdeep.cursecdn.com/login-sidebar-video/sidebar_video_2.webm"
-        ></video>
-      </VideoContainer>
-      <LoginContainer status={formik.status}>
-        {!!formik.status && (
-          <span className="error-message">{formik.status}</span>
-        )}
-        <h2>Login</h2>
-        <form onSubmit={formik.handleSubmit}>
-          <Input
-            name="login"
-            placeholder="Email"
-            defaultValue="test"
-            onChange={formik.handleChange}
-            value={formik.values.login}
-          />
-          <Input
-            name="password"
-            placeholder="Password"
-            onChange={formik.handleChange}
-            value={formik.values.password}
-          />
-          <input type="submit" />
-        </form>
-      </LoginContainer>
-      <SignOutButton>Sign Out</SignOutButton>
-    </Container>
-  );
-}
 
 export default Login;

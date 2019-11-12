@@ -22,4 +22,11 @@ module.exports = function(app) {
       changeOrigin: true
     })
   );
+  app.use(
+    "/refresh_token",
+    proxy({
+      target: "http://localhost:8000",
+      changeOrigin: true
+    })
+  );
 };
