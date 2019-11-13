@@ -1,6 +1,6 @@
 import React from "react";
 
-import withAuthorization from "../session/withAuth";
+import { withAuth } from "../session/withAuth";
 
 const AccountPage = () => (
   <div>
@@ -8,4 +8,4 @@ const AccountPage = () => (
   </div>
 );
 
-export default withAuthorization(session => session && session.me)(AccountPage);
+export default withAuth(data => data && data.me)(AccountPage);

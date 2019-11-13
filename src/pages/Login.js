@@ -12,9 +12,22 @@ import { GET_ME } from "../graphql/queries";
 function Login({ history }) {
   const [signIn, { loading }] = useMutation(SIGNIN_MUTATION, {
     onCompleted({ signIn }) {
-      if (signIn.data) {
-        setAccessToken(signIn.data.accessToken);
+      if (signIn.accessToken) {
+        setAccessToken(signIn.accessToken);
+        history.push("/");
       }
+    },
+    update(
+      cache,
+      {
+        data: { signIn }
+      }
+    ) {
+      // const { me } = cache.readQuery({ query: GET_ME });
+      cache.writeQuery({
+        query: GET_ME,
+        data: { me: signIn.user }
+      });
     }
   });
   const formik = useFormik({
@@ -23,24 +36,9 @@ function Login({ history }) {
       password: ""
     },
     onSubmit: async ({ login, password }, { setSubmitting, setStatus }) => {
-      const response = await signIn({
-        variables: { login, password },
-        update: (store, { data }) => {
-          store.writeQuery({
-            query: GET_ME,
-            data: {
-              me: data
-            }
-          });
-        }
+      signIn({
+        variables: { login, password }
       });
-      console.log(response);
-
-      if (response && response.data) {
-        setAccessToken(response.data.signIn.accessToken);
-      }
-
-      history.push("/");
     }
   });
   if (loading) return <p>Loading ...</p>;

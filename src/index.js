@@ -15,6 +15,7 @@ import { ApolloProvider } from "@apollo/react-hooks";
 import { signOut } from "./components/SignOut";
 import { getAccessToken, setAccessToken } from "./accessToken";
 import jwtDecode from "jwt-decode";
+import { access } from "fs";
 
 // Create apollo client
 const httpLink = createHttpLink({
@@ -25,7 +26,7 @@ const httpLink = createHttpLink({
 const authLink = new ApolloLink((operation, forward) => {
   operation.setContext(({ headers = {} }) => {
     const accessToken = getAccessToken();
-    console.log(accessToken);
+    console.log("GETTING ACCESSTOKEN" + accessToken);
     if (accessToken) {
       headers = {
         ...headers,
@@ -63,7 +64,6 @@ const tokenRefreshLink = new TokenRefreshLink({
   accessTokenField: "accessToken",
   isTokenValidOrUndefined: () => {
     const token = getAccessToken();
-
     if (!token) {
       return true;
     }
@@ -86,6 +86,7 @@ const tokenRefreshLink = new TokenRefreshLink({
     });
   },
   handleFetch: accessToken => {
+    console.log("HANDLE FETCH" + accessToken);
     setAccessToken(accessToken);
   },
   handleError: err => {
@@ -94,7 +95,7 @@ const tokenRefreshLink = new TokenRefreshLink({
   }
 });
 
-const link = ApolloLink.from([authLink, tokenRefreshLink, errorLink, httpLink]);
+const link = ApolloLink.from([tokenRefreshLink, authLink, errorLink, httpLink]);
 const cache = new InMemoryCache();
 const client = new ApolloClient({ link, cache });
 
