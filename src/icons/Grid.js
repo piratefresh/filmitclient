@@ -1,7 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-const EstimateIcon = ({ fill, stroke, strokeWidth, className, ...props }) => (
+const GridIcon = ({ fill, stroke, strokeWidth, className, ...props }) => (
   <svg
     width={24}
     height={24}
@@ -13,23 +13,22 @@ const EstimateIcon = ({ fill, stroke, strokeWidth, className, ...props }) => (
     className={className}
     {...props}
   >
-    <rect x={4} y={4} width={16} height={16} rx={2} ry={2} />
-    <path d="M9 9h6v6H9zM9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3" />
+    <path d="M3 3h7v7H3zM14 3h7v7h-7zM14 14h7v7h-7zM3 14h7v7H3z" />
   </svg>
 );
 
-EstimateIcon.propTypes = {
+GridIcon.propTypes = {
   fill: PropTypes.string,
   stroke: PropTypes.string,
   strokeWidth: PropTypes.string,
   className: PropTypes.string
 };
 
-EstimateIcon.defaultProps = {
+GridIcon.defaultProps = {
   fill: "none",
   stroke: "#f6f9fc",
   strokeWidth: "2",
   className: "nav-icon"
 };
 
-export default EstimateIcon;
+export default GridIcon;

@@ -1,12 +1,34 @@
-import React from 'react'
+import React from "react";
+import PropTypes from "prop-types";
 
-const Messages = props => (
-  <svg width={49} height={50} fill="none" {...props}>
-    <path
-      d="M34.708 24.75V6.375a2.042 2.042 0 00-2.041-2.042H6.125a2.042 2.042 0 00-2.042 2.042v28.583l8.167-8.166h20.417a2.042 2.042 0 002.041-2.042zm8.167-12.25h-4.083v18.375H12.25v4.083A2.042 2.042 0 0014.292 37H36.75l8.167 8.167V14.542a2.042 2.042 0 00-2.042-2.042z"
-      fill="#fff"
-    />
+const MessageIcon = ({ fill, stroke, strokeWidth, className, ...props }) => (
+  <svg
+    width={24}
+    height={24}
+    fill={fill}
+    stroke={stroke}
+    strokeWidth={strokeWidth}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    {...props}
+  >
+    <path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z" />
   </svg>
-)
+);
 
-export default Messages
+MessageIcon.propTypes = {
+  fill: PropTypes.string,
+  stroke: PropTypes.string,
+  strokeWidth: PropTypes.string,
+  className: PropTypes.string
+};
+
+MessageIcon.defaultProps = {
+  fill: "none",
+  stroke: "#f6f9fc",
+  strokeWidth: "2",
+  className: "nav-icon"
+};
+
+export default MessageIcon;

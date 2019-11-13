@@ -1,12 +1,36 @@
-import React from 'react'
+import React from "react";
+import PropTypes from "prop-types";
 
-const Users = props => (
-  <svg width={49} height={50} fill="none" {...props}>
-    <path
-      d="M32.667 34.958v4.084H4.083v-4.084s0-8.166 14.292-8.166 14.292 8.166 14.292 8.166zM25.52 15.563a7.146 7.146 0 10-14.292 0 7.146 7.146 0 0014.292 0zm7.023 11.229a10.86 10.86 0 014.206 8.166v4.084h8.167v-4.084s0-7.41-12.373-8.166zM30.625 8.417a6.921 6.921 0 00-3.94 1.204 10.208 10.208 0 010 11.883 6.921 6.921 0 003.94 1.204 7.146 7.146 0 100-14.291z"
-      fill="#fff"
-    />
+const UsersIcon = ({ fill, stroke, strokeWidth, className, ...props }) => (
+  <svg
+    width={24}
+    height={24}
+    fill={fill}
+    stroke={stroke}
+    strokeWidth={strokeWidth}
+    strokeLinecap="round"
+    strokeLinejoin="round"
+    className={className}
+    {...props}
+  >
+    <path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2" />
+    <circle cx={9} cy={7} r={4} />
+    <path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75" />
   </svg>
-)
+);
 
-export default Users
+UsersIcon.propTypes = {
+  fill: PropTypes.string,
+  stroke: PropTypes.string,
+  strokeWidth: PropTypes.string,
+  className: PropTypes.string
+};
+
+UsersIcon.defaultProps = {
+  fill: "none",
+  stroke: "#f6f9fc",
+  strokeWidth: "2",
+  className: "nav-icon"
+};
+
+export default UsersIcon;
