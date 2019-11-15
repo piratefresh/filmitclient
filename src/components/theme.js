@@ -1,6 +1,7 @@
 export const normalTheme = {
   colors: {
-    primary: "222222",
-    white: "#fff"
+    primary: "#267C6C",
+    white: "#fff",
+    lightGrey: "#F6F7F9"
   }
 };

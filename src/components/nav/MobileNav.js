@@ -8,9 +8,11 @@ import { GET_ME } from "../../graphql/queries";
 import Grid from "../../icons/Grid";
 import Users from "../../icons/Users";
 import Messages from "../../icons/Messages";
-import Estimate from "../../icons/Estimate";
 
 export function MobileNav() {
+  const { loading, error, data } = useQuery(GET_ME);
+  if (loading) return <div>Loading...</div>;
+  if (error) return console.log(error);
   return (
     <NavStyled>
       <ul>
@@ -31,7 +33,12 @@ export function MobileNav() {
         </Link>
         <Link>
           <NavLink my={2}>
-            <Estimate stroke="#212121" />
+            {data && data.me ? (
+              <img
+                src={`http://localhost:8000/myAvatars/${data.me.id}`}
+                alt={`Avatar for ${data.me.email}`}
+              />
+            ) : null}
           </NavLink>
         </Link>
       </ul>
@@ -67,12 +74,17 @@ const NavStyled = styled.nav`
 const NavLink = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: baseline;
   justify-content: center;
   color: #212121;
   padding: 20px;
   ${space};
   svg {
     margin-bottom: 5px;
+  }
+  img {
+    width: 25px;
+    height: 25px;
+    border-radius: 30px;
   }
 `;
