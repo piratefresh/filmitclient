@@ -33,3 +33,27 @@ export const SIGNOUT_MUTATION = gql`
     signOut
   }
 `;
+
+export const UPDATE_PROFILE_MUTATION = gql`
+  mutation updateProfile(
+    $id: ID!
+    $username: String!
+    $email: String!
+    $homepage: String
+    $bio: String
+  ) {
+    updateProfile(
+      id: $id
+      username: $username
+      email: $email
+      homepage: $homepage
+      bio: $bio
+    ) {
+      id
+      username
+      email
+      homepage
+      bio
+    }
+  }
+`;

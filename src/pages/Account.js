@@ -1,17 +1,55 @@
 import React from "react";
 import styled from "styled-components";
-import { useQuery } from "@apollo/react-hooks";
+import { useQuery, useMutation } from "@apollo/react-hooks";
 import { GET_ME } from "../graphql/queries";
+import { UPDATE_PROFILE_MUTATION } from "../graphql/mutations";
+import { useFormik } from "formik";
 
 import { withAuth } from "../session/withAuth";
-import EmailIcon from "../icons/Email";
-import PhoneIcon from "../icons/Phone";
-import AtIcon from "../icons/At";
+
 import Posts from "../components/list/Posts";
+import { Input } from "../components/form/BasicInput";
 
 const AccountPage = props => {
   const { loading, error, data } = useQuery(GET_ME);
+  const [updateProfile, { loading: updateProfileLoading }] = useMutation(
+    UPDATE_PROFILE_MUTATION,
+    {
+      onCompleted({ updateProfile }) {},
+      update(
+        cache,
+        {
+          data: { updateProfile }
+        }
+      ) {
+        // const { me } = cache.readQuery({ query: GET_ME });
+        cache.writeQuery({
+          query: GET_ME,
+          data: { me: updateProfile.user }
+        });
+      }
+    }
+  );
+  const formik = useFormik({
+    initialValues: {
+      id: data.me.id,
+      username: data.me.username,
+      email: data.me.email,
+      homepage: data.me.homepage ? data.me.homepage : "",
+      bio: data.me.bio ? data.me.bio : ""
+    },
+    onSubmit: async (
+      { id, username, email, homepage, bio },
+      { setSubmitting, setStatus }
+    ) => {
+      updateProfile({
+        variables: { id, username, email, homepage, bio }
+      });
+      console.log(username, email, homepage, bio);
+    }
+  });
   if (loading) return <div>Loading...</div>;
+  if (updateProfileLoading) return <div>Loading...</div>;
   if (error) return console.log(error);
   return (
     <AccountContainer>
@@ -21,37 +59,42 @@ const AccountPage = props => {
         src={`http://localhost:8000/myAvatars/${data.me.id}`}
         alt={`Avatar for ${data.me.email}`}
       />
-      <form action="">
-        <div className="field">
-          <div className="label-wrapper">
-            <label>
-              <AtIcon size={16} />
-            </label>
-            <span>Username:</span>
-          </div>
+      <form onSubmit={formik.handleSubmit}>
+        <Input
+          name="username"
+          label="Username"
+          icon="at"
+          onChange={formik.handleChange}
+          value={formik.values.username}
+          defaultValue={data.me.username}
+        />
+        <Input
+          name="email"
+          label="Email"
+          icon="email"
+          onChange={formik.handleChange}
+          value={formik.values.email}
+          defaultValue={data.me.email}
+        />
+        <Input
+          name="homepage"
+          label="Homepage"
+          icon="home"
+          onChange={formik.handleChange}
+          value={formik.values.homepage}
+          defaultValue={data.me.homepage}
+        />
+        <Input
+          name="bio"
+          label="Bio"
+          icon="bio"
+          type="textarea"
+          onChange={formik.handleChange}
+          value={formik.values.bio}
+          defaultValue={data.me.bio}
+        />
 
-          {data.me.username}
-        </div>
-        <div className="field">
-          <div className="label-wrapper">
-            <label>
-              <EmailIcon size={16} />
-            </label>
-            <span>Email:</span>
-          </div>
-
-          {data.me.email}
-        </div>
-        <div className="field">
-          <div className="label-wrapper">
-            <label>
-              <PhoneIcon size={16} />
-            </label>
-            <span>Phone:</span>
-          </div>
-
-          {data.me.email}
-        </div>
+        <input type="submit" />
       </form>
       <MyPostContainer>
         <h2>My Posts</h2>
@@ -69,27 +112,6 @@ const AccountContainer = styled.div`
   .user-picture {
     height: 120px;
     margin-bottom: 5%;
-  }
-
-  .field {
-    display: flex;
-    align-items: baseline;
-    justify-content: space-between;
-    margin-bottom: 5%;
-    label {
-      display: inline-flex;
-      background-color: ${props => props.theme.colors.primary};
-      padding: 3px;
-      margin-right: 5px;
-      align-items: center;
-      border-radius: 5px;
-      svg {
-        transform: scale(0.7);
-      }
-      span {
-        color: ${props => props.theme.colors.white};
-      }
-    }
   }
 `;
 

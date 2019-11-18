@@ -56,9 +56,8 @@ const Posts = () => {
                   <span className="post-active">Post is active</span>
                 )}
               </div>
-
-              <span className="post-text">{post.text}</span>
               <span className="post-location">{post.location}</span>
+              <span className="post-text">{post.text}</span>
               <div className="post-date-container">
                 <span className="post-date">{post.startDate}</span>
                 <span className="post-date">{post.endDate}</span>
@@ -79,8 +78,10 @@ const Post = styled.div`
   display: flex;
   flex-direction: row;
   align-items: center;
+  background-color: ${props => props.theme.colors.white};
+  border-radius: 5px;
   margin-bottom: 5%;
-  padding: 2%;
+  padding: 5%;
   .post-img {
     min-width: 80px;
     height: 60px;
@@ -116,6 +117,7 @@ const Post = styled.div`
       display: flex;
       flex-direction: row;
       font-weight: 600;
+      font-size: 0.9rem;
       justify-content: space-between;
       .post-date {
       }

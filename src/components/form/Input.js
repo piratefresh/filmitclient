@@ -82,6 +82,7 @@ export const Input = ({ name, placeholder, isRequired, value, onChange }) => {
 
 Input.propTypes = {
   name: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
   isRequired: PropTypes.bool
 };
 

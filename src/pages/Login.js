@@ -4,7 +4,7 @@ import { useMutation } from "@apollo/react-hooks";
 import { useFormik } from "formik";
 import { setAccessToken } from "../accessToken";
 
-import { Input } from "../components/forum/Input";
+import { Input } from "../components/form/Input";
 import GoogleSignInBtn from "../components/buttons/GoogleBtn";
 import { SIGNIN_MUTATION } from "../graphql/mutations";
 import { GET_ME } from "../graphql/queries";

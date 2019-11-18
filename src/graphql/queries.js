@@ -6,6 +6,8 @@ export const GET_ME = gql`
       id
       username
       email
+      bio
+      homepage
       role
     }
   }

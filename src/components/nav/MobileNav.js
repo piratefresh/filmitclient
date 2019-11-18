@@ -53,7 +53,7 @@ const NavStyled = styled.nav`
   flex-direction: row;
   align-items: center;
   justify-content: space-around;
-  height: 75px;
+  height: 64px;
   width: 100%;
   background-color: ${props => props.theme.colors.white};
   color: #212121;
