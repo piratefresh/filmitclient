@@ -26,12 +26,12 @@ export function MobileNav() {
             <Users stroke="#212121" />
           </NavLink>
         </Link>
-        <Link>
+        <Link to="/account">
           <NavLink my={2}>
             <Messages stroke="#212121" />
           </NavLink>
         </Link>
-        <Link>
+        <Link to="/account">
           <NavLink my={2}>
             {data && data.me ? (
               <img
