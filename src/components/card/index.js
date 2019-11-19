@@ -22,6 +22,6 @@ const CardContainer = styled.div`
   display: flex;
   flex-direction: column;
   background-color: #fff;
-  width: 250px;
-  height: 300px;
+  width: 90%;
+  height: 200px;
 `;

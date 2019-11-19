@@ -7,6 +7,7 @@ import { GET_ME } from "../../graphql/queries";
 
 import Grid from "../../icons/Grid";
 import Users from "../../icons/Users";
+import Home from "../../icons/Home";
 import Messages from "../../icons/Messages";
 
 export function MobileNav() {
@@ -18,10 +19,15 @@ export function MobileNav() {
       <ul>
         <Link to="/">
           <NavLink my={2}>
-            <Grid stroke="#212121" />
+            <Home stroke="#212121" />
           </NavLink>
         </Link>
         <Link to="/feed">
+          <NavLink my={2}>
+            <Grid stroke="#212121" />
+          </NavLink>
+        </Link>
+        <Link to="/users">
           <NavLink my={2}>
             <Users stroke="#212121" />
           </NavLink>
