@@ -1,4 +1,9 @@
-import React from 'react';
-import styled from 'styled-components'
+import React from "react";
+import styled from "styled-components";
 
-const 
+export const MainContainer = styled.div`
+  padding: 5%;
+  h1 {
+    text-align: center;
+  }
+`;

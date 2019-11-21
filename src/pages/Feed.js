@@ -1,6 +1,5 @@
 import React from "react";
-import { useQuery } from "@apollo/react-hooks";
-import gql from "graphql-tag";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 
 import PlusIcon from "../icons/Plus";
@@ -50,7 +49,9 @@ function Feed() {
     <Container>
       <div className="header">
         <h2>Feed</h2>
-        <PlusIcon stroke="#212121" />
+        <Link to="/createpost">
+          <PlusIcon stroke="#212121" />
+        </Link>
       </div>
       <StyledPostContainer>
         {dumData.map((post, index) => {

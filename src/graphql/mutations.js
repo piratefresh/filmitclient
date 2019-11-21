@@ -57,3 +57,30 @@ export const UPDATE_PROFILE_MUTATION = gql`
     }
   }
 `;
+
+export const CREATE_POST_MUTATION = gql`
+  mutation createPost(
+    $text: String!
+    $title: String!
+    $startDate: Date
+    $endDate: Date
+    $tags: [String]
+    $category: [String]
+  ) {
+    createPost(
+      title: $title
+      text: $text
+      startDate: $stateDate
+      endDate: $endDate
+      tags: $tags
+      category: $category
+    ) {
+      title
+      text
+      startDate
+      endDate
+      category
+      tags
+    }
+  }
+`;

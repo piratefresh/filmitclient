@@ -15,6 +15,7 @@ import { GET_ME } from "./graphql/queries";
 import { normalTheme } from "./components/theme";
 import Home from "./pages/Home";
 import Feed from "./pages/Feed";
+import CreatePost from "./pages/createPost";
 import Account from "./pages/Account";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
@@ -35,12 +36,7 @@ function App() {
         setLoading(false);
       }
     },
-    update(
-      cache,
-      {
-        data: { authGoogle }
-      }
-    ) {
+    update(cache, { data: { authGoogle } }) {
       const data = cache.readQuery({ query: GET_ME });
       cache.writeQuery({
         query: GET_ME,
@@ -85,6 +81,12 @@ function App() {
               layout={LoginLayout}
             />
             <AppRoute exact path="/feed" component={Feed} layout={MainLayout} />
+            <AppRoute
+              exact
+              path="/createpost"
+              component={CreatePost}
+              layout={MainLayout}
+            />
             <AppRoute
               exact
               path="/account"
