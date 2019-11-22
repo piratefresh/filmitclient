@@ -73,7 +73,7 @@ export const Input = ({
   return (
     <Container>
       <StyledLabelWrapper>
-        <label>{icons[icon]}</label>
+        {icon ? <label>{icons[icon]}</label> : null}
         <span>{label}</span>
       </StyledLabelWrapper>
       {type === "textarea" ? (
