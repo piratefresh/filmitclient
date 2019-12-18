@@ -4,7 +4,9 @@ import styled from "styled-components";
 import { useQuery } from "@apollo/react-hooks";
 import { GET_POSTS } from "../graphql/queries";
 import Posts from "../components/list/Posts";
+import { ErrorMessageContainer } from "../components/container";
 
+import { POST_CREATED } from "../graphql/subscription";
 import PlusIcon from "../icons/Plus";
 
 // const dumData = [
@@ -48,8 +50,38 @@ import PlusIcon from "../icons/Plus";
 // ];
 
 function Feed() {
-  const { loading, error, data } = useQuery(GET_POSTS);
+  const { loading, error, data, subscribeToMore, fetchMore } = useQuery(
+    GET_POSTS
+  );
+  React.useEffect(() => {
+    const unsubscribe = subscribeToMore({
+      document: POST_CREATED,
+      updateQuery: (previousResult, { subscriptionData }) => {
+        // If the subscription data does not exist
+        // Simply return the previous data
+        console.log(previousResult.posts);
+        if (!subscriptionData.data) return previousResult;
+        const { postCreated } = subscriptionData.data;
+        console.log(postCreated);
+        return {
+          posts: {
+            ...previousResult.posts,
+            edges: [postCreated, ...previousResult.posts.edges]
+          }
+        };
+      }
+    });
+    return () => unsubscribe();
+  }, [subscribeToMore]);
+
   if (loading) return <div>loading..</div>;
+  if (!data)
+    return (
+      <ErrorMessageContainer>
+        No Post Found
+        <Link to="/createpost">Add A Post</Link>
+      </ErrorMessageContainer>
+    );
   const posts = data.posts.edges;
   return (
     <Container>
@@ -60,7 +92,22 @@ function Feed() {
         </Link>
       </div>
       <StyledPostContainer>
-        <Posts posts={posts}></Posts>
+        <Posts
+          posts={posts}
+          onLoadMore={() =>
+            fetchMore({
+              variables: {
+                offset: posts.length
+              },
+              updateQuery: (prev, { fetchMoreResult }) => {
+                if (!fetchMoreResult) return prev;
+                return Object.assign({}, prev, {
+                  posts: [...prev.posts.edges, ...fetchMoreResult.posts]
+                });
+              }
+            })
+          }
+        ></Posts>
       </StyledPostContainer>
     </Container>
   );

@@ -10,6 +10,7 @@ import { Select } from "../components/form/Select";
 import "../styles/geosuggest.css";
 import Geosuggest, { Suggest } from "react-geosuggest";
 
+import { GET_POSTS } from "../graphql/queries";
 import { MainContainer } from "../components/container";
 import PlusIcon from "../icons/Plus";
 import { AddButton } from "../components/buttons/buttons";
@@ -20,13 +21,26 @@ const options = [
   { value: "vanilla", label: "Vanilla" }
 ];
 
-const CreatePost = () => {
+const CreatePost = ({ history }) => {
   const [fields, setFields] = React.useState([{ value: null }]);
   const [startDate, setStartDate] = React.useState([{ value: null }]);
   const [selectedOption, setSelectedOption] = React.useState(null);
   const [image, setImage] = React.useState();
   const [largeImage, setLargeImage] = React.useState();
-  const [createPost, { loading }] = useMutation(CREATE_POST_MUTATION);
+  const [createPost, { loading }] = useMutation(CREATE_POST_MUTATION, {
+    onCompleted({ createPost }) {
+      if (createPost.title) {
+        history.push("/feed");
+      }
+    },
+    update(cache, { data: { createPost } }) {
+      const { posts } = cache.readQuery({ query: GET_POSTS });
+      cache.writeQuery({
+        query: GET_POSTS,
+        data: { posts: posts.concat([createPost]) }
+      });
+    }
+  });
   const formik = useFormik({
     initialValues: {
       title: "",

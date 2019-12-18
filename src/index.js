@@ -10,18 +10,36 @@ import { InMemoryCache } from "apollo-cache-inmemory";
 import { ApolloLink, split } from "apollo-link";
 import { onError } from "apollo-link-error";
 import { createHttpLink } from "apollo-link-http";
+import { WebSocketLink } from "apollo-link-ws";
+import { getMainDefinition } from "apollo-utilities";
 import { TokenRefreshLink } from "apollo-link-token-refresh";
 import { ApolloProvider } from "@apollo/react-hooks";
 import { signOut } from "./components/SignOut";
 import { getAccessToken, setAccessToken } from "./accessToken";
 import jwtDecode from "jwt-decode";
-import { access } from "fs";
 
 // Create apollo client
 const httpLink = createHttpLink({
   uri: "http://localhost:8000/graphql",
   credentials: "include"
 });
+
+// Create a WebSocket link:
+const wsLink = new WebSocketLink({
+  uri: `ws://localhost:8000/graphql`,
+  options: {
+    reconnect: true
+  }
+});
+
+const terminatingLink = split(
+  ({ query }) => {
+    const { kind, operation } = getMainDefinition(query);
+    return kind === "OperationDefinition" && operation === "subscription";
+  },
+  wsLink,
+  httpLink
+);
 
 const authLink = new ApolloLink((operation, forward) => {
   operation.setContext(({ headers = {} }) => {
@@ -95,7 +113,12 @@ const tokenRefreshLink = new TokenRefreshLink({
   }
 });
 
-const link = ApolloLink.from([tokenRefreshLink, authLink, errorLink, httpLink]);
+const link = ApolloLink.from([
+  tokenRefreshLink,
+  authLink,
+  errorLink,
+  terminatingLink
+]);
 const cache = new InMemoryCache();
 const client = new ApolloClient({ link, cache });
 

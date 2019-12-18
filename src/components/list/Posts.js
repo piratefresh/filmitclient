@@ -41,9 +41,19 @@ const dumData = [
   }
 ];
 
-const Posts = ({ posts }) => {
+const handleScroll = ({ currentTarget }, onLoadMore) => {
+  if (
+    currentTarget.scrollTop + currentTarget.clientHeight >=
+    currentTarget.scrollHeight
+  ) {
+    onLoadMore();
+  }
+};
+
+const Posts = ({ posts, onLoadMore }) => {
+  if (posts.length < 0) return <div>No Posts</div>;
   return (
-    <PostsContainer>
+    <PostsContainer onScroll={e => handleScroll(e, onLoadMore)}>
       {posts.map((post, index) => {
         return (
           <Post key={index}>

@@ -23,8 +23,8 @@ export const GET_USERS = gql`
 `;
 
 export const GET_POSTS = gql`
-  {
-    posts {
+  query getPosts($offset: Int) {
+    posts(limit: 4, offset: $offset) {
       edges {
         id
         text

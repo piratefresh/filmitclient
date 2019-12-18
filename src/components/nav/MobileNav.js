@@ -9,6 +9,7 @@ import Grid from "../../icons/Grid";
 import Users from "../../icons/Users";
 import Home from "../../icons/Home";
 import Messages from "../../icons/Messages";
+import Login from "../../icons/Login";
 
 export function MobileNav() {
   const { loading, error, data } = useQuery(GET_ME);
@@ -19,22 +20,26 @@ export function MobileNav() {
       <ul>
         <Link to="/">
           <NavLink my={2}>
-            <Home stroke="#212121" />
+            <Home />
+            <div>Home</div>
           </NavLink>
         </Link>
         <Link to="/feed">
           <NavLink my={2}>
-            <Grid stroke="#212121" />
+            <Grid />
+            <div>Feed</div>
           </NavLink>
         </Link>
         <Link to="/users">
           <NavLink my={2}>
-            <Users stroke="#212121" />
+            <Users />
+            <div>Profiles</div>
           </NavLink>
         </Link>
         <Link to="/account">
           <NavLink my={2}>
-            <Messages stroke="#212121" />
+            <Messages />
+            <div>Messages</div>
           </NavLink>
         </Link>
         {data && data.me ? (
@@ -44,11 +49,15 @@ export function MobileNav() {
                 src={`http://localhost:8000/myAvatars/${data.me.id}`}
                 alt={`Avatar for ${data.me.email}`}
               />
+              <div>{data.me.username}</div>
             </NavLink>
           </Link>
         ) : (
           <Link to="/login">
-            <NavLink my={2}>Login</NavLink>
+            <NavLink my={2}>
+              <Login />
+              Login
+            </NavLink>
           </Link>
         )}
       </ul>
@@ -66,8 +75,7 @@ const NavStyled = styled.nav`
   height: 64px;
   width: 100%;
   background-color: ${props => props.theme.colors.white};
-  color: #212121;
-  border-top: 1px solid #212121;
+  color: ${props => props.theme.colors.dark};
   ul {
     display: flex;
     align-items: center;
@@ -84,13 +92,15 @@ const NavStyled = styled.nav`
 const NavLink = styled.div`
   display: flex;
   flex-direction: column;
-  align-items: baseline;
+  align-items: center;
   justify-content: center;
   color: #212121;
   padding: 20px;
+  font-size: ${props => props.theme.textSize.smaller};
   ${space};
   svg {
     margin-bottom: 5px;
+    stroke: ${props => props.theme.colors.dark} !important;
   }
   img {
     width: 25px;

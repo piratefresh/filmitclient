@@ -9,7 +9,9 @@ function Home() {
   );
   const { loading: meLoading, error: meError, data: meData } = useQuery(GET_ME);
   if (meLoading || userLoading) return <p>Loading ...</p>;
-  console.log(meData, userData);
+  console.log(meError);
+
+  if (!meData) return <div>No User Data</div>;
   return (
     <div>
       <h2>Home</h2>
