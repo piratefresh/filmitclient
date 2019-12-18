@@ -37,16 +37,20 @@ export function MobileNav() {
             <Messages stroke="#212121" />
           </NavLink>
         </Link>
-        <Link to="/account">
-          <NavLink my={2}>
-            {data && data.me ? (
+        {data && data.me ? (
+          <Link to="/account">
+            <NavLink my={2}>
               <img
                 src={`http://localhost:8000/myAvatars/${data.me.id}`}
                 alt={`Avatar for ${data.me.email}`}
               />
-            ) : null}
-          </NavLink>
-        </Link>
+            </NavLink>
+          </Link>
+        ) : (
+          <Link to="/login">
+            <NavLink my={2}>Login</NavLink>
+          </Link>
+        )}
       </ul>
     </NavStyled>
   );

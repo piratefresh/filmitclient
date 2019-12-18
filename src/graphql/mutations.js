@@ -62,25 +62,31 @@ export const CREATE_POST_MUTATION = gql`
   mutation createPost(
     $text: String!
     $title: String!
-    $startDate: Date
-    $endDate: Date
+    $postImage: String!
+    $location: String!
+    $lng: Float!
+    $lat: Float!
     $tags: [String]
     $category: [String]
   ) {
     createPost(
       title: $title
       text: $text
-      startDate: $stateDate
-      endDate: $endDate
+      postImage: $postImage
       tags: $tags
       category: $category
+      location: $location
+      lat: $lat
+      lng: $lng
     ) {
       title
       text
-      startDate
-      endDate
+      postImage
       category
       tags
+      location
+      lat
+      lng
     }
   }
 `;

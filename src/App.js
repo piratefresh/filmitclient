@@ -19,6 +19,7 @@ import CreatePost from "./pages/createPost";
 import Account from "./pages/Account";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
+import { TestSelect } from "./pages/testSelect";
 
 const GlobalStyle = createGlobalStyle`
   body {
@@ -91,6 +92,12 @@ function App() {
               exact
               path="/account"
               component={Account}
+              layout={MainLayout}
+            />
+            <AppRoute
+              exact
+              path="/testselect"
+              component={TestSelect}
               layout={MainLayout}
             />
             <AppRoute component={NotFound} />

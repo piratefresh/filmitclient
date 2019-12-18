@@ -21,3 +21,24 @@ export const GET_USERS = gql`
     }
   }
 `;
+
+export const GET_POSTS = gql`
+  {
+    posts {
+      edges {
+        id
+        text
+        title
+        createdAt
+        tags
+        location
+        category
+        postImage
+        user {
+          username
+          email
+        }
+      }
+    }
+  }
+`;

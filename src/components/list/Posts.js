@@ -41,13 +41,13 @@ const dumData = [
   }
 ];
 
-const Posts = () => {
+const Posts = ({ posts }) => {
   return (
     <PostsContainer>
-      {dumData.map((post, index) => {
+      {posts.map((post, index) => {
         return (
           <Post key={index}>
-            <img className="post-img" src={post.img} />
+            <img className="post-img" src={post.postImage} />
 
             <div className="text-content">
               <div className="post-title-container">
@@ -59,8 +59,7 @@ const Posts = () => {
               <span className="post-location">{post.location}</span>
               <span className="post-text">{post.text}</span>
               <div className="post-date-container">
-                <span className="post-date">{post.startDate}</span>
-                <span className="post-date">{post.endDate}</span>
+                <span className="post-date">{post.createdAt}</span>
               </div>
             </div>
           </Post>
