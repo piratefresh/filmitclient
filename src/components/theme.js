@@ -9,5 +9,9 @@ export const normalTheme = {
   },
   textSize: {
     smaller: "0.8rem"
+  },
+  text: {
+    normalLineHeight: "1.5",
+    wideLineHeight: "2"
   }
 };

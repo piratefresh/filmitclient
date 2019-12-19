@@ -1,7 +1,6 @@
 import React from "react";
 import styled from "styled-components";
-import { space } from "styled-system";
-import { Link } from "react-router-dom";
+import StyledNavLink from "../link/StyledNavLink";
 import { useQuery } from "@apollo/react-hooks";
 import { GET_ME } from "../../graphql/queries";
 
@@ -18,47 +17,35 @@ export function MobileNav() {
   return (
     <NavStyled>
       <ul>
-        <Link to="/">
-          <NavLink my={2}>
-            <Home />
-            <div>Home</div>
-          </NavLink>
-        </Link>
-        <Link to="/feed">
-          <NavLink my={2}>
-            <Grid />
-            <div>Feed</div>
-          </NavLink>
-        </Link>
-        <Link to="/users">
-          <NavLink my={2}>
-            <Users />
-            <div>Profiles</div>
-          </NavLink>
-        </Link>
-        <Link to="/account">
-          <NavLink my={2}>
-            <Messages />
-            <div>Messages</div>
-          </NavLink>
-        </Link>
+        <StyledNavLink exact to="/" my={2}>
+          <Home />
+          <div>Home</div>
+        </StyledNavLink>
+        <StyledNavLink to="/feed" my={2}>
+          <Grid />
+          <div>Feed</div>
+        </StyledNavLink>
+        <StyledNavLink to="/users" my={2}>
+          <Users />
+          <div>Profiles</div>
+        </StyledNavLink>
+        <StyledNavLink to="/messages" my={2}>
+          <Messages />
+          <div>Messages</div>
+        </StyledNavLink>
         {data && data.me ? (
-          <Link to="/account">
-            <NavLink my={2}>
-              <img
-                src={`http://localhost:8000/myAvatars/${data.me.id}`}
-                alt={`Avatar for ${data.me.email}`}
-              />
-              <div>{data.me.username}</div>
-            </NavLink>
-          </Link>
+          <StyledNavLink to="/account" my={2}>
+            <img
+              src={`http://localhost:8000/myAvatars/${data.me.id}`}
+              alt={`Avatar for ${data.me.email}`}
+            />
+            <div>{data.me.username}</div>
+          </StyledNavLink>
         ) : (
-          <Link to="/login">
-            <NavLink my={2}>
-              <Login />
-              Login
-            </NavLink>
-          </Link>
+          <StyledNavLink to="/login" my={2}>
+            <Login />
+            Login
+          </StyledNavLink>
         )}
       </ul>
     </NavStyled>
@@ -86,25 +73,5 @@ const NavStyled = styled.nav`
   }
   a {
     text-decoration: none !important;
-  }
-`;
-
-const NavLink = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  color: #212121;
-  padding: 20px;
-  font-size: ${props => props.theme.textSize.smaller};
-  ${space};
-  svg {
-    margin-bottom: 5px;
-    stroke: ${props => props.theme.colors.dark} !important;
-  }
-  img {
-    width: 25px;
-    height: 25px;
-    border-radius: 30px;
   }
 `;

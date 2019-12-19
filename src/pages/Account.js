@@ -16,12 +16,7 @@ const AccountPage = props => {
     UPDATE_PROFILE_MUTATION,
     {
       onCompleted({ updateProfile }) {},
-      update(
-        cache,
-        {
-          data: { updateProfile }
-        }
-      ) {
+      update(cache, { data: { updateProfile } }) {
         // const { me } = cache.readQuery({ query: GET_ME });
         cache.writeQuery({
           query: GET_ME,
@@ -98,7 +93,7 @@ const AccountPage = props => {
       </form>
       <MyPostContainer>
         <h2>My Posts</h2>
-        <Posts></Posts>
+        <Posts posts={data.me.posts}></Posts>
       </MyPostContainer>
     </AccountContainer>
   );

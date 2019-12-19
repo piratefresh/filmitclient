@@ -9,6 +9,16 @@ export const GET_ME = gql`
       bio
       homepage
       role
+      posts {
+        id
+        text
+        title
+        createdAt
+        tags
+        location
+        category
+        postImage
+      }
     }
   }
 `;

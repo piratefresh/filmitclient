@@ -1,5 +1,7 @@
 import React from "react";
 import styled, { css } from "styled-components";
+import StyledLink from "../link/StyledLink";
+import { format } from "date-fns";
 
 const dumData = [
   {
@@ -51,27 +53,35 @@ const handleScroll = ({ currentTarget }, onLoadMore) => {
 };
 
 const Posts = ({ posts, onLoadMore }) => {
-  if (posts.length < 0) return <div>No Posts</div>;
+  if (!posts) return <div>No Posts</div>;
+
   return (
     <PostsContainer onScroll={e => handleScroll(e, onLoadMore)}>
       {posts.map((post, index) => {
         return (
           <Post key={index}>
-            <img className="post-img" src={post.postImage} />
+            <div className="post-header">
+              <StyledLink to={`/post/${post.id}`}>
+                <img className="post-img" src={post.postImage} />
+              </StyledLink>
 
-            <div className="text-content">
-              <div className="post-title-container">
-                <span className="post-title">{post.title}</span>
-                {post.active && (
-                  <span className="post-active">Post is active</span>
-                )}
-              </div>
-              <span className="post-location">{post.location}</span>
-              <span className="post-text">{post.text}</span>
-              <div className="post-date-container">
-                <span className="post-date">{post.createdAt}</span>
+              <div className="header-content">
+                <div className="post-title-container">
+                  <StyledLink to={`/post/${post.id}`}>
+                    <span className="post-title">{post.title}</span>
+                  </StyledLink>
+                  {post.active && (
+                    <span className="post-active">Post is active</span>
+                  )}
+                </div>
+                <span className="post-location">{post.location}</span>
+                <span className="post-date">
+                  {format(new Date(post.createdAt), "MMM dd")}
+                </span>
               </div>
             </div>
+
+            <span className="post-text">{post.text}</span>
           </Post>
         );
       })}
@@ -85,22 +95,25 @@ const PostsContainer = styled.div`
 `;
 const Post = styled.div`
   display: flex;
-  flex-direction: row;
-  align-items: center;
+  flex-direction: column;
   background-color: ${props => props.theme.colors.white};
   border-radius: 5px;
   margin-bottom: 5%;
   padding: 5%;
+  .post-header {
+    display: flex;
+    flex-direction: row;
+  }
   .post-img {
-    min-width: 80px;
-    height: 60px;
+    width: 80px;
+    height: 70px;
     border-radius: 5px;
     object-fit: cover;
-    margin-right: 2%;
   }
-  .text-content {
+  .header-content {
     display: flex;
     flex-direction: column;
+    margin-left: 10px;
     .post-title-container {
       display: flex;
       justify-content: space-between;
@@ -108,29 +121,27 @@ const Post = styled.div`
       .post-title {
         font-weight: 600;
         font-size: 1.2rem;
+        color: ${props => props.theme.colors.dark};
       }
       .post-active {
         color: ${props => props.theme.colors.primary};
         font-size: 0.9rem;
       }
     }
-    .post-text {
-      font-size: 0.9rem;
-      font-weight: 400;
-      margin: 2% 0;
-    }
     .post-location {
       margin: 2% 0;
     }
-    .post-date-container {
-      display: flex;
-      flex-direction: row;
-      font-weight: 600;
+    .post-date {
       font-size: 0.9rem;
-      justify-content: space-between;
-      .post-date {
-      }
+      font-weight: 400;
     }
+  }
+  .post-text {
+    font-size: 0.9rem;
+    font-weight: 400;
+    margin: 2% 0;
+    width: 24em;
+    line-height: ${props => props.theme.text.normalLineHeight};
   }
 `;
 

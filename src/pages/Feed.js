@@ -7,7 +7,8 @@ import Posts from "../components/list/Posts";
 import { ErrorMessageContainer } from "../components/container";
 
 import { POST_CREATED } from "../graphql/subscription";
-import PlusIcon from "../icons/Plus";
+import StyledLink from "../components/link/StyledLink";
+import { AddButton } from "../components/buttons/buttons";
 
 // const dumData = [
 //   {
@@ -79,7 +80,7 @@ function Feed() {
     return (
       <ErrorMessageContainer>
         No Post Found
-        <Link to="/createpost">Add A Post</Link>
+        <StyledLink to="/createpost">Add A Post</StyledLink>
       </ErrorMessageContainer>
     );
   const posts = data.posts.edges;
@@ -87,9 +88,9 @@ function Feed() {
     <Container>
       <div className="header">
         <h2>Feed</h2>
-        <Link to="/createpost">
-          <PlusIcon stroke="#212121" />
-        </Link>
+        <StyledLink to="/createpost">
+          <AddButton>Add Project</AddButton>
+        </StyledLink>
       </div>
       <StyledPostContainer>
         <Posts
