@@ -32,6 +32,26 @@ export const GET_USERS = gql`
   }
 `;
 
+export const GET_POST = gql`
+  query getPost($id: ID!) {
+    post(id: $id) {
+      id
+      text
+      title
+      createdAt
+      tags
+      location
+      category
+      postImage
+      user {
+        id
+        username
+        email
+      }
+    }
+  }
+`;
+
 export const GET_POSTS = gql`
   query getPosts($offset: Int) {
     posts(limit: 4, offset: $offset) {

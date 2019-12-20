@@ -12,13 +12,13 @@ const StyledNavLink = styled(NavLink).attrs({
   align-items: center;
   justify-content: center;
   position: relative;
-  color: #212121;
+  color: ${props => props.theme.colors.primaryLighter};
   padding: 20px;
   font-size: ${props => props.theme.textSize.smaller};
   ${space};
   svg {
     margin-bottom: 5px;
-    stroke: ${props => props.theme.colors.dark};
+    stroke: ${props => props.theme.colors.primaryLighter};
   }
   img {
     width: 25px;

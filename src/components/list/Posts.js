@@ -134,6 +134,7 @@ const Post = styled.div`
     .post-date {
       font-size: 0.9rem;
       font-weight: 400;
+      color: ${props => props.theme.colors.primaryLighter};
     }
   }
   .post-text {
@@ -142,6 +143,7 @@ const Post = styled.div`
     margin: 2% 0;
     width: 24em;
     line-height: ${props => props.theme.text.normalLineHeight};
+    color: ${props => props.theme.colors.primaryDarker};
   }
 `;
 

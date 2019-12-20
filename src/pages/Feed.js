@@ -76,13 +76,6 @@ function Feed() {
   }, [subscribeToMore]);
 
   if (loading) return <div>loading..</div>;
-  if (!data)
-    return (
-      <ErrorMessageContainer>
-        No Post Found
-        <StyledLink to="/createpost">Add A Post</StyledLink>
-      </ErrorMessageContainer>
-    );
   const posts = data.posts.edges;
   return (
     <Container>
@@ -93,22 +86,29 @@ function Feed() {
         </StyledLink>
       </div>
       <StyledPostContainer>
-        <Posts
-          posts={posts}
-          onLoadMore={() =>
-            fetchMore({
-              variables: {
-                offset: posts.length
-              },
-              updateQuery: (prev, { fetchMoreResult }) => {
-                if (!fetchMoreResult) return prev;
-                return Object.assign({}, prev, {
-                  posts: [...prev.posts.edges, ...fetchMoreResult.posts]
-                });
-              }
-            })
-          }
-        ></Posts>
+        {posts ? (
+          <Posts
+            posts={posts}
+            onLoadMore={() =>
+              fetchMore({
+                variables: {
+                  offset: posts.length
+                },
+                updateQuery: (prev, { fetchMoreResult }) => {
+                  if (!fetchMoreResult) return prev;
+                  return Object.assign({}, prev, {
+                    posts: [...prev.posts.edges, ...fetchMoreResult.posts]
+                  });
+                }
+              })
+            }
+          ></Posts>
+        ) : (
+          <ErrorMessageContainer>
+            No Post Found
+            <StyledLink to="/createpost">Add A Post</StyledLink>
+          </ErrorMessageContainer>
+        )}
       </StyledPostContainer>
     </Container>
   );

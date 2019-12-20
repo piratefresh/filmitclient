@@ -62,7 +62,7 @@ const NavStyled = styled.nav`
   height: 64px;
   width: 100%;
   background-color: ${props => props.theme.colors.white};
-  color: ${props => props.theme.colors.dark};
+  color: ${props => props.theme.colors.primaryLighter};
   ul {
     display: flex;
     align-items: center;
