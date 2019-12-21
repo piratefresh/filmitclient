@@ -21,7 +21,11 @@ function Post() {
     <PostContainer>
       <img src={post.postImage} alt={`Header Image for ${post.title}`} />
       <div className="post-text-container">
-        <h2 className="post-title">{post.title}</h2>
+        <div className="post-header">
+          <h2 className="post-title">{post.title}</h2>
+          <span className="post-location">{post.location}</span>
+        </div>
+
         <div className="post-meta-details-container">
           <Avatar
             src={`http://localhost:8000/myAvatars/${post.user.id}`}
@@ -34,7 +38,7 @@ function Post() {
           </div>
         </div>
 
-        <p>{post.text}</p>
+        <p className="post-text">{post.text}</p>
       </div>
     </PostContainer>
   );
@@ -47,6 +51,8 @@ const PostContainer = styled.div`
     display: flex;
     flex-direction: row;
     align-items: center;
+    margin-top: 10px;
+    color: ${props => props.theme.colors.primaryLighter};
     .post-meta-details {
       margin-left: 15px;
       line-height: ${props => props.theme.text.normalLineHeight};
@@ -55,6 +61,8 @@ const PostContainer = styled.div`
   }
   img {
     width: 100%;
+    max-height: 60vh;
+    object-fit: cover;
   }
   .post-text-container {
     padding: 5%;
@@ -66,6 +74,14 @@ const PostContainer = styled.div`
     .post-title {
       font-size: ${props => props.theme.textSize.headline};
       color: ${props => props.theme.colors.primary};
+      margin: 0;
+      padding: 0;
+    }
+    .post-location {
+      margin-bottom: 2em;
+    }
+    .post-text {
+      white-space: pre-line;
     }
   }
 `;

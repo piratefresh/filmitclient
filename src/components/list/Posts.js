@@ -144,6 +144,7 @@ const Post = styled.div`
     width: 24em;
     line-height: ${props => props.theme.text.normalLineHeight};
     color: ${props => props.theme.colors.primaryDarker};
+    word-wrap: break-word;
   }
 `;
 

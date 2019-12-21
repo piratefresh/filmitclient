@@ -6,9 +6,10 @@ import { useMutation } from "@apollo/react-hooks";
 import { CREATE_POST_MUTATION } from "../graphql/mutations";
 import { Input } from "../components/form/BasicInput";
 import { UploadImage } from "../components/upload/ImageUpload";
-import { Select } from "../components/form/Select";
+// import { Select } from "../components/form/Select";
 import "../styles/geosuggest.css";
 import Geosuggest, { Suggest } from "react-geosuggest";
+import CheckBox from "../components/form/Checkboxes";
 
 import { GET_POSTS } from "../graphql/queries";
 import { MainContainer } from "../components/container";
@@ -23,8 +24,6 @@ const options = [
 
 const CreatePost = ({ history }) => {
   const [fields, setFields] = React.useState([{ value: null }]);
-  const [startDate, setStartDate] = React.useState([{ value: null }]);
-  const [selectedOption, setSelectedOption] = React.useState(null);
   const [image, setImage] = React.useState();
   const [largeImage, setLargeImage] = React.useState();
   const [createPost, { loading }] = useMutation(CREATE_POST_MUTATION, {
@@ -34,10 +33,16 @@ const CreatePost = ({ history }) => {
       }
     },
     update(cache, { data: { createPost } }) {
-      const { posts } = cache.readQuery({ query: GET_POSTS });
+      let posts = [];
+      try {
+        const data = cache.readQuery({ query: GET_POSTS });
+        posts = data.posts.edges;
+      } catch (err) {
+        console.log(err);
+      }
       cache.writeQuery({
         query: GET_POSTS,
-        data: { posts: posts.concat([createPost]) }
+        data: { posts: [...posts, createPost] }
       });
     }
   });
@@ -121,6 +126,9 @@ const CreatePost = ({ history }) => {
             label="Header Image"
           />
         </ImageContainer>
+        <FormSection>
+          <h3>Basic Information:</h3>
+        </FormSection>
         <Input
           name="title"
           label="Title"
@@ -136,6 +144,9 @@ const CreatePost = ({ history }) => {
           value={formik.values.text}
           defaultValue
         />
+        <FormSection>
+          <h3>Detailed Information:</h3>
+        </FormSection>
         <span>Location</span>
         <Geosuggest
           onSuggestSelect={onSuggestSelect}
@@ -145,21 +156,20 @@ const CreatePost = ({ history }) => {
           country={["us", "ca"]}
           radius={20}
         />
-        <Select
-          id="category"
-          label="Category"
-          onChange={formik.handleChange}
-          value={formik.values.category}
-          size="small"
-        >
-          <option selected value="">
-            Select Option
-          </option>
-          <option value="ny">New York</option>
-          <option value="ca">California</option>
-          <option value="tn">Tennessee</option>
-          <option value="fl">Florida</option>
-        </Select>
+        <CheckboxList>
+          {checkboxes.map(item => {
+            return (
+              <label key={item.key}>
+                <CheckBox
+                  name={item.name}
+                  // checked={this.state.checkedItems.get(item.name)}
+                  // onChange={this.handleChange}
+                />
+                {item.name}
+              </label>
+            );
+          })}
+        </CheckboxList>
         <AddButton type="button" onClick={() => handleAdd()}>
           Add Tag <PlusIcon />
         </AddButton>
@@ -184,7 +194,7 @@ const CreatePost = ({ history }) => {
             </TagsContainer>
           );
         })}
-        <button type="submit">Submit</button>
+        <AddButton type="submit">Submit</AddButton>
       </form>
     </MainContainer>
   );
@@ -222,5 +232,65 @@ const TagsContainer = styled.div`
     }
   }
 `;
+
+const FormSection = styled.h3`
+  h3 {
+    color: ${props => props.theme.colors.primary};
+    border-bottom: 1px solid ${props => props.theme.colors.primary};
+    line-height: 2em;
+  }
+`;
+
+const CheckboxList = styled.div`
+  display: flex;
+  flex-direction: column;
+  border-radius: 5px;
+  padding: 20px 30px;
+  max-height: 200px;
+  overflow-y: scroll;
+  background: #efeef0;
+  border: none;
+  box-shadow: none;
+  font-size: 16px;
+  font-weight: 600;
+`;
+
+const checkboxes = [
+  {
+    name: "Movie",
+    key: "checkBox1",
+    label: "Movie"
+  },
+  {
+    name: "Production",
+    key: "checkBox2",
+    label: "Production"
+  },
+  {
+    name: "Development",
+    key: "checkBox3",
+    label: "Development"
+  },
+  {
+    name: "Graphic",
+    key: "checkBox4",
+    label: "Graphic"
+  },
+  {
+    name: "Visual Effects",
+    key: "vfx1",
+    label: "vfx"
+  },
+  {
+    name: "Music Production",
+    key: "music",
+    label: "Music Production"
+  },
+  {
+    name: "Marketing",
+    key: "Marketing2",
+    label: "Marketing"
+  }
+];
 
 export default CreatePost;

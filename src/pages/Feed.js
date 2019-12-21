@@ -76,7 +76,6 @@ function Feed() {
   }, [subscribeToMore]);
 
   if (loading) return <div>loading..</div>;
-  const posts = data.posts.edges;
   return (
     <Container>
       <div className="header">
@@ -86,13 +85,13 @@ function Feed() {
         </StyledLink>
       </div>
       <StyledPostContainer>
-        {posts ? (
+        {data.posts && data.posts.edges ? (
           <Posts
-            posts={posts}
+            posts={data.posts.edges}
             onLoadMore={() =>
               fetchMore({
                 variables: {
-                  offset: posts.length
+                  offset: data.posts.length
                 },
                 updateQuery: (prev, { fetchMoreResult }) => {
                   if (!fetchMoreResult) return prev;

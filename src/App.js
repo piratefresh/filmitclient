@@ -13,6 +13,7 @@ import { SIGNIN_GOOGLE_MUTATION } from "./graphql/mutations";
 import { GET_ME } from "./graphql/queries";
 
 import { normalTheme } from "./components/theme";
+import { PrivatRoute } from "./components/ProtectedRoute";
 import Home from "./pages/Home";
 import Feed from "./pages/Feed";
 import CreatePost from "./pages/createPost";
@@ -83,7 +84,7 @@ function App() {
               layout={LoginLayout}
             />
             <AppRoute exact path="/feed" component={Feed} layout={MainLayout} />
-            <AppRoute
+            <PrivatRoute
               exact
               path="/createpost"
               component={CreatePost}
