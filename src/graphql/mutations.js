@@ -34,6 +34,20 @@ export const SIGNOUT_MUTATION = gql`
   }
 `;
 
+export const CONFIRM_EMAIL_MUTATION = gql`
+  mutation confirmEmail($email: String!, $emailConfirmToken: String!) {
+    confirmEmail(email: $email, emailConfirmToken: $emailConfirmToken) {
+      accessToken
+      user {
+        id
+        username
+        email
+        role
+      }
+    }
+  }
+`;
+
 export const UPDATE_PROFILE_MUTATION = gql`
   mutation updateProfile(
     $id: ID!
@@ -41,6 +55,15 @@ export const UPDATE_PROFILE_MUTATION = gql`
     $email: String!
     $homepage: String
     $bio: String
+    $avatar: String
+    $firstName: String
+    $lastName: String
+    $location: String
+    $vimeo: String
+    $youtube: String
+    $linkedin: String
+    $instagram: String
+    $facebook: String
   ) {
     updateProfile(
       id: $id
@@ -48,12 +71,30 @@ export const UPDATE_PROFILE_MUTATION = gql`
       email: $email
       homepage: $homepage
       bio: $bio
+      avatar: $avatar
+      firstName: $firstName
+      lastName: $lastName
+      location: $location
+      facebook: $facebook
+      linkedin: $linkedin
+      youtube: $youtube
+      vimeo: $vimeo
+      instagram: $instagram
     ) {
       id
       username
       email
       homepage
       bio
+      avatar
+      firstName
+      lastName
+      location
+      vimeo
+      facebook
+      linkedin
+      youtube
+      instagram
     }
   }
 `;
@@ -87,6 +128,17 @@ export const CREATE_POST_MUTATION = gql`
       location
       lat
       lng
+    }
+  }
+`;
+
+export const CREATE_MESSAGE_MUTATION = gql`
+  mutation createMessage($receiverId: String!) {
+    createMessage(receiverId: $receiverId) {
+      chatId
+      members {
+        userId
+      }
     }
   }
 `;

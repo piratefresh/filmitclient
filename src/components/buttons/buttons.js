@@ -1,7 +1,7 @@
 import styled from "styled-components";
 
 export const AddButton = styled.button`
-  border-radius: 5%;
+  border-radius: 5px;
   display: flex;
   align-items: center;
   border: none;

@@ -63,7 +63,6 @@ export function UploadImage({ label, setImage, setLargeImage, setFieldValue }) {
         className="file-input"
         type="file"
         placeholder="Upload an image"
-        required
         onChange={uploadFile}
       />
       <span className="file-control" data-filename="Choose File..."></span>

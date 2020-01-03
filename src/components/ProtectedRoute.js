@@ -21,7 +21,11 @@ import { GET_ME } from "../graphql/queries";
 //   />
 // );
 
-export const PrivatRoute = ({ component: Component, ...rest }) => {
+export const PrivatRoute = ({
+  component: Component,
+  layout: Layout,
+  ...rest
+}) => {
   const { loading, error, data } = useQuery(GET_ME);
   if (loading) return <div>Loading User data...</div>;
   return (
@@ -29,7 +33,9 @@ export const PrivatRoute = ({ component: Component, ...rest }) => {
       {...rest}
       render={props =>
         data.me ? (
-          <Component {...props} />
+          <Layout>
+            <Component {...props} />
+          </Layout>
         ) : (
           <Redirect
             to={{

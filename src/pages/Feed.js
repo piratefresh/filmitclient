@@ -85,19 +85,26 @@ function Feed() {
         </StyledLink>
       </div>
       <StyledPostContainer>
-        {data.posts && data.posts.edges ? (
+        {data && data.posts && data.posts.edges ? (
           <Posts
-            posts={data.posts.edges}
+            posts={data.posts.edges || []}
             onLoadMore={() =>
               fetchMore({
                 variables: {
-                  offset: data.posts.length
+                  cursor: data.posts.pageInfo.endCursor
                 },
-                updateQuery: (prev, { fetchMoreResult }) => {
-                  if (!fetchMoreResult) return prev;
-                  return Object.assign({}, prev, {
-                    posts: [...prev.posts.edges, ...fetchMoreResult.posts]
-                  });
+                updateQuery: (prevResult, { fetchMoreResult }) => {
+                  const newEdges = fetchMoreResult.posts.edges;
+                  const pageInfo = fetchMoreResult.posts.pageInfo;
+                  return newEdges.length
+                    ? {
+                        posts: {
+                          __typename: prevResult.posts.__typename,
+                          edges: [...prevResult.posts.edges, ...newEdges],
+                          pageInfo
+                        }
+                      }
+                    : prevResult;
                 }
               })
             }

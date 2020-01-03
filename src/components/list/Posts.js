@@ -1,7 +1,8 @@
-import React from "react";
+import React, { useEffect } from "react";
 import styled, { css } from "styled-components";
 import StyledLink from "../link/StyledLink";
 import { format } from "date-fns";
+import useEventListener from "../hooks/useEventHandler";
 
 const dumData = [
   {
@@ -52,39 +53,85 @@ const handleScroll = ({ currentTarget }, onLoadMore) => {
   }
 };
 
+const handleOnScroll = () => {
+  // http://stackoverflow.com/questions/9439725/javascript-how-to-detect-if-browser-window-is-scrolled-to-bottom
+  var scrollTop =
+    (document.documentElement && document.documentElement.scrollTop) ||
+    document.body.scrollTop;
+  var scrollHeight =
+    (document.documentElement && document.documentElement.scrollHeight) ||
+    document.body.scrollHeight;
+  var clientHeight =
+    document.documentElement.clientHeight || window.innerHeight;
+  var scrolledToBottom = Math.ceil(scrollTop + clientHeight) >= scrollHeight;
+  if (scrolledToBottom) {
+  }
+};
+
 const Posts = ({ posts, onLoadMore }) => {
+  const [fetch, setFetch] = React.useState(false);
+  // Event handler utilizing useCallback ...
+  // ... so that reference never changes.
+  const handleOnScroll = React.useCallback(
+    onLoadMore => {
+      // http://stackoverflow.com/questions/9439725/javascript-how-to-detect-if-browser-window-is-scrolled-to-bottom
+      var scrollTop =
+        (document.documentElement && document.documentElement.scrollTop) ||
+        document.body.scrollTop;
+      var scrollHeight =
+        (document.documentElement && document.documentElement.scrollHeight) ||
+        document.body.scrollHeight;
+      var clientHeight =
+        document.documentElement.clientHeight || window.innerHeight;
+      var scrolledToBottom =
+        Math.ceil(scrollTop + clientHeight) >= scrollHeight;
+      if (scrolledToBottom) {
+        setFetch(true);
+      } else {
+        setFetch(false);
+      }
+    },
+    [setFetch]
+  );
+  useEventListener("scroll", handleOnScroll);
+
+  React.useEffect(() => {
+    if (fetch && onLoadMore) onLoadMore();
+  }, [fetch]);
+
   if (!posts) return <div>No Posts</div>;
-
   return (
-    <PostsContainer onScroll={e => handleScroll(e, onLoadMore)}>
-      {posts.map((post, index) => {
-        return (
-          <Post key={index}>
-            <div className="post-header">
-              <StyledLink to={`/post/${post.id}`}>
-                <img className="post-img" src={post.postImage} />
-              </StyledLink>
+    <PostsContainer>
+      <div onScroll={e => console.log("SCROLLING")}>
+        {posts.map((post, index) => {
+          return (
+            <Post key={index}>
+              <div className="post-header">
+                <StyledLink to={`/post/${post.id}`}>
+                  <img className="post-img" src={post.postImage} />
+                </StyledLink>
 
-              <div className="header-content">
-                <div className="post-title-container">
-                  <StyledLink to={`/post/${post.id}`}>
-                    <span className="post-title">{post.title}</span>
-                  </StyledLink>
-                  {post.active && (
-                    <span className="post-active">Post is active</span>
-                  )}
+                <div className="header-content">
+                  <div className="post-title-container">
+                    <StyledLink to={`/post/${post.id}`}>
+                      <span className="post-title">{post.title}</span>
+                    </StyledLink>
+                    {post.active && (
+                      <span className="post-active">Post is active</span>
+                    )}
+                  </div>
+                  <span className="post-location">{post.location}</span>
+                  <span className="post-date">
+                    {format(new Date(post.createdAt), "MMM dd")}
+                  </span>
                 </div>
-                <span className="post-location">{post.location}</span>
-                <span className="post-date">
-                  {format(new Date(post.createdAt), "MMM dd")}
-                </span>
               </div>
-            </div>
 
-            <span className="post-text">{post.text}</span>
-          </Post>
-        );
-      })}
+              <span className="post-text">{post.text}</span>
+            </Post>
+          );
+        })}
+      </div>
     </PostsContainer>
   );
 };

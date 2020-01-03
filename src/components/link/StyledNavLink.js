@@ -21,9 +21,10 @@ const StyledNavLink = styled(NavLink).attrs({
     stroke: ${props => props.theme.colors.primaryLighter};
   }
   img {
-    width: 25px;
-    height: 25px;
-    border-radius: 30px;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
   }
   &.${activeClassName} {
     color: ${props => props.theme.colors.primary};

@@ -36,6 +36,14 @@ const StyledTextArea = styled.textarea`
 const StyledLabelWrapper = styled.div`
   display: flex;
   align-items: center;
+  .FieldTitle {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 10px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    display: block;
+  }
   label {
     display: inline-flex;
     background-color: ${props => props.theme.colors.primary};
@@ -74,7 +82,7 @@ export const Input = ({
     <Container>
       <StyledLabelWrapper>
         {icon ? <label>{icons[icon]}</label> : null}
-        <span>{label}</span>
+        <span className="FieldTitle">{label}</span>
       </StyledLabelWrapper>
       {type === "textarea" ? (
         <StyledTextArea

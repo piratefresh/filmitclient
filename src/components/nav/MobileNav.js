@@ -36,7 +36,11 @@ export function MobileNav() {
         {data && data.me ? (
           <StyledNavLink to="/account" my={2}>
             <img
-              src={`http://localhost:8000/myAvatars/${data.me.id}`}
+              src={
+                data.me.avatar
+                  ? data.me.avatar
+                  : `http://localhost:8000/myAvatars/${data.me.id}`
+              }
               alt={`Avatar for ${data.me.email}`}
             />
             <div>{data.me.username}</div>

@@ -21,6 +21,10 @@ import Account from "./pages/Account";
 import NotFound from "./pages/NotFound";
 import Login from "./pages/Login";
 import Post from "./pages/Post";
+import Users from "./pages/Users";
+import Messages from "./pages/Messages";
+import SignUp from "./pages/SignUp";
+import ConfirmEmail from "./pages/ConfirmEmail";
 import { TestSelect } from "./pages/testSelect";
 
 const GlobalStyle = createGlobalStyle`
@@ -48,27 +52,25 @@ function App() {
     }
   });
 
-  const persistUser = async () => {
+  const persistUser = async setLoading => {
     const x = await fetch("http://localhost:3000/refresh_token", {
       method: "POST",
       credentials: "include"
     });
     const { accessToken } = await x.json();
     setAccessToken(accessToken);
-    setLoading(false);
+    setLoading(loading => !loading);
   };
 
   React.useEffect(() => {
-    persistUser();
+    persistUser(setLoading);
     const googleUser = Cookies.get("gtoken");
     if (googleUser) {
       authGoogle({ variables: { input: { accessToken: googleUser } } });
     }
   }, []);
 
-  if (loading) {
-    return <div>loading...</div>;
-  }
+  if (loading) return <div>loading...</div>;
 
   return (
     <ThemeProvider theme={normalTheme}>
@@ -81,6 +83,18 @@ function App() {
               exact
               path="/login"
               component={Login}
+              layout={LoginLayout}
+            />
+            <AppRoute
+              exact
+              path="/signup"
+              component={SignUp}
+              layout={LoginLayout}
+            />
+            <AppRoute
+              exact
+              path="/confirm-email/:email/:emailConfirmToken"
+              component={ConfirmEmail}
               layout={LoginLayout}
             />
             <AppRoute exact path="/feed" component={Feed} layout={MainLayout} />
@@ -104,11 +118,18 @@ function App() {
             />
             <AppRoute
               exact
-              path="/testselect"
-              component={TestSelect}
+              path="/users"
+              component={Users}
               layout={MainLayout}
             />
-            <AppRoute component={NotFound} />
+            <AppRoute
+              exact
+              path="/messages"
+              component={Messages}
+              layout={MainLayout}
+            />
+
+            <AppRoute component={NotFound} layout={LoginLayout} />
           </Switch>
         </Router>
       </div>

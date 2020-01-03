@@ -15,9 +15,10 @@ function Home() {
   return (
     <div>
       <h2>Home</h2>
-      {userData.users.map((user, i) => {
-        return <li key={i}>{user.username}</li>;
-      })}
+      {userData &&
+        userData.users.map((user, i) => {
+          return <li key={i}>{user.username}</li>;
+        })}
       <UploadAvatar />
     </div>
   );

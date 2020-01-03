@@ -3,22 +3,23 @@ import styled, { css } from "styled-components";
 import { useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import { useFormik } from "formik";
-
-import { Input } from "../components/forum/Input";
+import { Input } from "../components/form/Input";
 import GoogleSignInBtn from "../components/buttons/GoogleBtn";
 
 const SIGNUP_MUTATION = gql`
   mutation signUp($username: String!, $email: String!, $password: String!) {
     signUp(username: $username, email: $email, password: $password) {
-      token
+      accessToken
     }
   }
 `;
 
-function SignUp() {
+function SignUp({ history }) {
   const [signUp, { loading }] = useMutation(SIGNUP_MUTATION, {
     onCompleted({ signUp }) {
-      history;
+      if (signUp.token) {
+        history.push("/");
+      }
     }
   });
   const formik = useFormik({
@@ -131,4 +132,4 @@ const LoginContainer = styled.main`
     `}
 `;
 
-export default Login;
+export default SignUp;
