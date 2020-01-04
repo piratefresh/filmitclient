@@ -25,6 +25,7 @@ import Users from "./pages/Users";
 import Messages from "./pages/Messages";
 import SignUp from "./pages/SignUp";
 import ConfirmEmail from "./pages/ConfirmEmail";
+import User from "./pages/User";
 import { TestSelect } from "./pages/testSelect";
 
 const GlobalStyle = createGlobalStyle`
@@ -114,6 +115,12 @@ function App() {
               exact
               path="/post/:id"
               component={Post}
+              layout={MainLayout}
+            />
+            <AppRoute
+              exact
+              path="/user/:id"
+              component={User}
               layout={MainLayout}
             />
             <AppRoute

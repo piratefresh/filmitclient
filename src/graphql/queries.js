@@ -65,6 +65,38 @@ export const GET_QUERY_USERS = gql`
   }
 `;
 
+export const GET_USER = gql`
+  query user($id: ID!) {
+    user(id: $id) {
+      id
+      username
+      email
+      bio
+      homepage
+      role
+      avatar
+      firstName
+      lastName
+      location
+      instagram
+      youtube
+      facebook
+      linkedin
+      vimeo
+      posts {
+        id
+        text
+        title
+        createdAt
+        tags
+        location
+        category
+        postImage
+      }
+    }
+  }
+`;
+
 export const GET_POST = gql`
   query getPost($id: ID!) {
     post(id: $id) {

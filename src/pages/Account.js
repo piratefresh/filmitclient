@@ -88,7 +88,7 @@ const AccountPage = ({ history }) => {
           email,
           homepage,
           bio,
-          avatar,
+          avatar: image,
           firstName,
           lastName,
           location,
@@ -146,6 +146,7 @@ const AccountPage = ({ history }) => {
         {image && <img width="200" src={image} alt="Upload Preview" />}
         <UploadImage
           setFieldValue={formik.setFieldValue}
+          setImage={setImage}
           label="Header Image"
         />
       </ImageContainer>

@@ -49,7 +49,6 @@ export function UploadImage({ label, setImage, setLargeImage, setFieldValue }) {
     );
     const file = await res.json();
     setImage(file.secure_url);
-    setLargeImage(file.secure_url);
   };
 
   React.useEffect(() => {
