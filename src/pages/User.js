@@ -5,6 +5,10 @@ import { useQuery } from "@apollo/react-hooks";
 import { GET_USER } from "../graphql/queries";
 
 import { Avatar } from "../components/avatar";
+import { AddButton } from "../components/buttons/buttons";
+import useModal from "../components/hooks/useModal";
+import Modal from "../components/modal";
+import { Input } from "../components/form/BasicInput";
 
 function User() {
   let { id } = useParams();
@@ -13,6 +17,7 @@ function User() {
       id
     }
   });
+  const { isShown, toggle } = useModal();
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
@@ -39,6 +44,14 @@ function User() {
             <span className="user-location">{user.location}</span>
           </div>
         </div>
+        <AddButton onClick={toggle}>Message</AddButton>
+        {isShown && (
+          <Modal content="Test" buttonLabel="Message" toggle={toggle}>
+            <h3>Send a message to {user.firstName}</h3>
+            <Input name="content" type="textarea" />
+            <AddButton>Message</AddButton>
+          </Modal>
+        )}
 
         <p className="user-text">{user.bio}</p>
       </div>
@@ -54,6 +67,7 @@ const UserContainer = styled.div`
     flex-direction: row;
     align-items: center;
     margin-top: 10px;
+    margin-bottom: 10px;
     color: ${props => props.theme.colors.primaryLighter};
     .user-meta-details {
       margin-left: 15px;
@@ -86,4 +100,11 @@ const UserContainer = styled.div`
       white-space: pre-line;
     }
   }
+`;
+
+const ModalSeperator = styled.div`
+  color: ${props => props.theme.colors.primary};
+  border-bottom: 1px solid ${props => props.theme.colors.primary};
+  line-height: 2em;
+  margin-top: 75px;
 `;
