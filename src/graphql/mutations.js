@@ -133,12 +133,30 @@ export const CREATE_POST_MUTATION = gql`
 `;
 
 export const CREATE_MESSAGE_MUTATION = gql`
-  mutation createMessage($receiverId: String!) {
-    createMessage(receiverId: $receiverId) {
-      chatId
-      members {
-        userId
+  mutation createMessage($receiverId: String!, $content: String!) {
+    createMessage(receiverId: $receiverId, content: $content) {
+      content
+      channelId
+      receiverId {
+        firstName
+        lastName
       }
+    }
+  }
+`;
+
+// export const CREATE_CHANNEL_MUTATION = gql`
+//   mutation createChannel($receiverId: Int!, $content: String!) {
+//     createChannel(receiverId: $receiverId, content: $content) {
+//       id
+//     }
+//   }
+// `;
+
+export const CREATE_CHANNEL_MUTATION = gql`
+  mutation createChannel($receiverId: Int, $content: String) {
+    createChannel(receiverId: $receiverId, content: $content) {
+      id
     }
   }
 `;

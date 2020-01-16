@@ -17,6 +17,9 @@ import { ApolloProvider } from "@apollo/react-hooks";
 import { signOut } from "./components/SignOut";
 import { getAccessToken, setAccessToken } from "./accessToken";
 import jwtDecode from "jwt-decode";
+// Redux
+// import { configureStore } from "@reduxjs/toolkit";
+// import { Provider } from "react-redux";
 
 // Create apollo client
 const httpLink = createHttpLink({
@@ -121,6 +124,11 @@ const link = ApolloLink.from([
 ]);
 const cache = new InMemoryCache();
 const client = new ApolloClient({ link, cache });
+
+// Redux config
+// const store = configureStore({
+//   reducer: rootReducer
+// });
 
 const Root = () => (
   <ApolloProvider client={client}>

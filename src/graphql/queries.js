@@ -141,3 +141,32 @@ export const GET_POSTS = gql`
     }
   }
 `;
+
+export const GET_CHANNELS = gql`
+  query channels {
+    channels {
+      edges {
+        id
+        members
+        messages {
+          id
+          content
+          receiverId {
+            id
+            username
+            firstName
+            lastName
+            avatar
+          }
+          senderId {
+            id
+            username
+            firstName
+            lastName
+            avatar
+          }
+        }
+      }
+    }
+  }
+`;

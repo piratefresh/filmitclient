@@ -3,11 +3,12 @@ import { useQuery, useMutation } from "@apollo/react-hooks";
 import gql from "graphql-tag";
 import styled from "styled-components";
 import { useFormik } from "formik";
-import { GET_USERS, GET_ME } from "../graphql/queries";
+import { GET_USERS, GET_ME, GET_CHANNELS } from "../graphql/queries";
 import { CREATE_MESSAGE_MUTATION } from "../graphql/mutations";
 import { MainContainer } from "../components/container";
 import AutoComplete from "../components/autoCompleter/hooks";
 import { Input } from "../components/form/BasicInput";
+import ChannelList from "../components/chat/ChannelList";
 
 function Messages() {
   const [searchValue, setSearchValue] = React.useState([]);
@@ -15,6 +16,11 @@ function Messages() {
   const { loading: userLoading, error: userError, data: userData } = useQuery(
     GET_USERS
   );
+  const {
+    loading: channelsLoading,
+    error: channelsError,
+    data: channelsData
+  } = useQuery(GET_CHANNELS);
   const [createMessage, { loading: createMessageLoading }] = useMutation(
     CREATE_MESSAGE_MUTATION,
     {
@@ -64,6 +70,9 @@ function Messages() {
             defaultValue
           />
         </FormContainer>
+      )}
+      {channelsData && channelsData.channels && channelsData.channels.edges && (
+        <ChannelList channels={channelsData.channels.edges} me={data} />
       )}
     </MainContainer>
   );

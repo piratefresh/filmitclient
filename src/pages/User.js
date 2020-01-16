@@ -1,8 +1,10 @@
 import React from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
-import { useQuery } from "@apollo/react-hooks";
-import { GET_USER } from "../graphql/queries";
+import { useQuery, useMutation } from "@apollo/react-hooks";
+import { GET_USER, GET_ME } from "../graphql/queries";
+import { CREATE_CHANNEL_MUTATION } from "../graphql/mutations";
+import { useFormik } from "formik";
 
 import { Avatar } from "../components/avatar";
 import { AddButton } from "../components/buttons/buttons";
@@ -12,13 +14,39 @@ import { Input } from "../components/form/BasicInput";
 
 function User() {
   let { id } = useParams();
+  const { loading: meLoading, error: meError, data: meData } = useQuery(GET_ME);
   const { loading, error, data } = useQuery(GET_USER, {
     variables: {
       id
     }
   });
+  const [createChannel, { loading: createChannelLoading }] = useMutation(
+    CREATE_CHANNEL_MUTATION
+  );
   const { isShown, toggle } = useModal();
-
+  // Form
+  const formik = useFormik({
+    initialValues: {
+      receiverId: null,
+      content: ""
+    },
+    onSubmit: ({ receiverId, content }) => {
+      createChannel({
+        variables: {
+          receiverId: parseInt(receiverId, 10),
+          content
+        }
+      });
+      console.log(receiverId, content);
+    }
+  });
+  // Sets the hidden input with receiver id and sender id
+  React.useEffect(() => {
+    if (isShown && id && meData) {
+      formik.setFieldValue("receiverId", id);
+      formik.setFieldValue("senderId", meData.me.id);
+    }
+  }, [isShown]);
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
   const { user } = data;
@@ -48,8 +76,17 @@ function User() {
         {isShown && (
           <Modal content="Test" buttonLabel="Message" toggle={toggle}>
             <h3>Send a message to {user.firstName}</h3>
-            <Input name="content" type="textarea" />
-            <AddButton>Message</AddButton>
+            <form onSubmit={formik.handleSubmit}>
+              <input name="receiverId" type="hidden" />
+              <input name="members" type="hidden" />
+              <Input
+                name="content"
+                type="textarea"
+                onChange={formik.handleChange}
+                value={formik.values.content}
+              />
+              <AddButton type="submit">Message</AddButton>
+            </form>
           </Modal>
         )}
 
@@ -101,7 +138,7 @@ const UserContainer = styled.div`
     }
   }
 `;
-
+const HiddenForm = styled.form``;
 const ModalSeperator = styled.div`
   color: ${props => props.theme.colors.primary};
   border-bottom: 1px solid ${props => props.theme.colors.primary};
