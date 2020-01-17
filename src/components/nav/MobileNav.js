@@ -14,7 +14,7 @@ import Login from "../../icons/Login";
 export function MobileNav() {
   const { loading, error, data } = useQuery(GET_ME);
   const { data: dataSub } = useSubscription(MESSAGE_CREATED_SUBSCRIPTION, {
-    variables: { receiverId: data ? data.me.id : null }
+    variables: { receiverId: data && data.me ? data.me.id : null }
   });
   if (loading) return <div>Loading...</div>;
   if (error) return console.log(error);

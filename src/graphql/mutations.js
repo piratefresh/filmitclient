@@ -127,8 +127,8 @@ export const CREATE_POST_MUTATION = gql`
     $location: String!
     $lng: Float!
     $lat: Float!
-    $tags: [String]
-    $category: [String]
+    $tags: [String!]
+    $category: [String!]
   ) {
     createPost(
       title: $title

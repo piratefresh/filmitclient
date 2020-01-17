@@ -142,6 +142,24 @@ export const GET_POSTS = gql`
   }
 `;
 
+export const SEARCH_POSTS = gql`
+  query searchPosts($query: String!) {
+    searchPosts(query: $query) {
+      id
+      title
+      text
+      username
+      firstName
+      lastName
+      location
+      tags
+      category
+      createdAt
+      postImage
+    }
+  }
+`;
+
 export const GET_CHANNELS = gql`
   query channels {
     channels {

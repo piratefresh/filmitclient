@@ -1,9 +1,9 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import { useQuery, useLazyQuery } from "@apollo/react-hooks";
 import { GET_POSTS, SEARCH_POSTS } from "../graphql/queries";
-import Posts from "../components/list/Posts";
+import Posts from "../components/list/PostsNoScroll";
 import { ErrorMessageContainer } from "../components/container";
 import Sidebar from "../components/menu/Sidebar";
 import useSidebar from "../components/hooks/useSidebar";
@@ -15,15 +15,13 @@ import { POST_CREATED } from "../graphql/subscription";
 import StyledLink from "../components/link/StyledLink";
 import { AddButton, SecondaryButton } from "../components/buttons/buttons";
 
-function Feed({ history }) {
-  const {
-    loading,
-    error,
-    data,
-    subscribeToMore,
-    fetchMore,
-    updateQuery: updatePostsQuery
-  } = useQuery(GET_POSTS);
+function SearchFeed({ history }) {
+  let { query } = useParams();
+  const { called, loading, data } = useQuery(SEARCH_POSTS, {
+    variables: {
+      query
+    }
+  });
 
   const formik = useFormik({
     initialValues: {
@@ -35,27 +33,6 @@ function Feed({ history }) {
       }
     }
   });
-
-  React.useEffect(() => {
-    const unsubscribe = subscribeToMore({
-      document: POST_CREATED,
-      updateQuery: (previousResult, { subscriptionData }) => {
-        // If the subscription data does not exist
-        // Simply return the previous data
-        console.log(previousResult.posts);
-        if (!subscriptionData.data) return previousResult;
-        const { postCreated } = subscriptionData.data;
-        console.log(postCreated);
-        return {
-          posts: {
-            ...previousResult.posts,
-            edges: [postCreated, ...previousResult.posts.edges]
-          }
-        };
-      }
-    });
-    return () => unsubscribe();
-  }, [subscribeToMore]);
 
   const { isOpen, toggle } = useSidebar();
   if (loading) return <div>loading..</div>;
@@ -96,30 +73,8 @@ function Feed({ history }) {
         </Sidebar>
       )}
       <StyledPostContainer>
-        {data && data.posts && data.posts.edges ? (
-          <Posts
-            posts={data.posts.edges || []}
-            onLoadMore={() =>
-              fetchMore({
-                variables: {
-                  cursor: data.posts.pageInfo.endCursor
-                },
-                updateQuery: (prevResult, { fetchMoreResult }) => {
-                  const newEdges = fetchMoreResult.posts.edges;
-                  const pageInfo = fetchMoreResult.posts.pageInfo;
-                  return newEdges.length
-                    ? {
-                        posts: {
-                          __typename: prevResult.posts.__typename,
-                          edges: [...prevResult.posts.edges, ...newEdges],
-                          pageInfo
-                        }
-                      }
-                    : prevResult;
-                }
-              })
-            }
-          ></Posts>
+        {data && data.searchPosts ? (
+          <Posts posts={data.searchPosts || []}></Posts>
         ) : (
           <ErrorMessageContainer>
             No Post Found
@@ -198,4 +153,4 @@ const FilterContainer = styled.div`
   padding: 5%;
 `;
 
-export default Feed;
+export default SearchFeed;
