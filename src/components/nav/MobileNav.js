@@ -1,8 +1,9 @@
 import React from "react";
 import styled from "styled-components";
 import StyledNavLink from "../link/StyledNavLink";
-import { useQuery } from "@apollo/react-hooks";
+import { useQuery, useSubscription } from "@apollo/react-hooks";
 import { GET_ME } from "../../graphql/queries";
+import { MESSAGE_CREATED_SUBSCRIPTION } from "../../graphql/subscription";
 
 import Grid from "../../icons/Grid";
 import Users from "../../icons/Users";
@@ -12,6 +13,9 @@ import Login from "../../icons/Login";
 
 export function MobileNav() {
   const { loading, error, data } = useQuery(GET_ME);
+  const { data: dataSub } = useSubscription(MESSAGE_CREATED_SUBSCRIPTION, {
+    variables: { receiverId: data ? data.me.id : null }
+  });
   if (loading) return <div>Loading...</div>;
   if (error) return console.log(error);
   return (

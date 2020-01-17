@@ -18,3 +18,7 @@ export const AddButton = styled.button`
     background-color: ${({ theme }) => theme.colors.primaryDarker};
   }
 `;
+
+export const SecondaryButton = styled(AddButton)`
+  background-color: ${props => props.theme.colors.lightBlue};
+`;

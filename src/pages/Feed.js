@@ -5,50 +5,15 @@ import { useQuery } from "@apollo/react-hooks";
 import { GET_POSTS } from "../graphql/queries";
 import Posts from "../components/list/Posts";
 import { ErrorMessageContainer } from "../components/container";
+import Sidebar from "../components/menu/Sidebar";
+import useSidebar from "../components/hooks/useSidebar";
+import SearchInput from "../components/form/SearchInput";
+import Search from "../icons/Search";
+import { CATEGORIES } from "../components/data/constants";
 
 import { POST_CREATED } from "../graphql/subscription";
 import StyledLink from "../components/link/StyledLink";
-import { AddButton } from "../components/buttons/buttons";
-
-// const dumData = [
-//   {
-//     title: "Superbad",
-//     category: ["Light", "Production"],
-//     tags: ["Comedy", "Drama"],
-//     text:
-//       "We have a fun and dynamic group who will be filming all day on Saturday, November 9th in Maywood, CA. If you want to take part in filmmaking, join us! We can provide the transportation to-and-from and we'll feed you, but this is a non-paid offer.We are looking for three energetic and able-bodied people with positive attitudes to help out.",
-//     startDate: "Nov 16, 2019",
-//     endDate: "Dec 24, 2019",
-//     location: "Philadelphia, PA",
-//     img:
-//       "https://cdn.dribbble.com/users/3281732/screenshots/8159457/media/9e7bfb83b0bd704e941baa7a44282b22.jpg"
-//   },
-//   {
-//     title: "Taxi Driver",
-//     category: ["Post-Production", "Editor"],
-//     tags: ["Comedy", "Drama"],
-//     text:
-//       "Barstool Sports is looking for a Freelance Motion Graphics Artist familiar with Adobe Photoshop, After Effects and Illustrator. Video editing experience would be a big plus. Please provide a link to a portfolio or reel when applying. Barstool is a fast pace and growing company. We need creative and driven artists that can thrive is this environment.",
-//     startDate: "Nov 16, 2019",
-//     endDate: "Dec 24, 2019",
-//     location: "Philadelphia, PA",
-//     img:
-//       "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSq8JBEZYMRridpz8sFe63Bzvt3mIZhNsFJbPXOo2qRVKW0-rGP&s",
-//     active: true
-//   },
-//   {
-//     title: "Assistent Editor",
-//     category: ["Editor", "Production", "Assistent"],
-//     tags: ["Comedy", "Drama"],
-//     text:
-//       "The Assistant Editor is responsible for supporting our team of video editors and creatives in a fast-paced environment. Ideal candidates are well-versed in all technical aspects of a 4K+ raw video workflow, including file formats, ingesting, logging, proxies, syncing, conforming for online and sound mix, archiving, Media Asset Management and delivering multiple formats for a variety of digital platforms.",
-//     startDate: "Nov 16, 2019",
-//     endDate: "Dec 24, 2019",
-//     location: "Philadelphia, PA",
-//     img:
-//       "https://s3.amazonaws.com/images.productionhub.com/jobs/logos/55822_u5ntg3mtuy.jpg"
-//   }
-// ];
+import { AddButton, SecondaryButton } from "../components/buttons/buttons";
 
 function Feed() {
   const { loading, error, data, subscribeToMore, fetchMore } = useQuery(
@@ -75,7 +40,9 @@ function Feed() {
     return () => unsubscribe();
   }, [subscribeToMore]);
 
+  const { isOpen, toggle } = useSidebar();
   if (loading) return <div>loading..</div>;
+
   return (
     <Container>
       <div className="header">
@@ -84,6 +51,25 @@ function Feed() {
           <AddButton>Add Project</AddButton>
         </StyledLink>
       </div>
+      <div className="header-filter">
+        <div className="searchInput">
+          <div className="icon">
+            <Search />
+          </div>
+          <input type="text" placeholder="Search jobs" />
+        </div>
+
+        <SecondaryButton onClick={toggle}>Filter</SecondaryButton>
+      </div>
+      {isOpen && (
+        <Sidebar>
+          <FilterContainer>
+            {CATEGORIES.map(notif => {
+              return <li>{notif.title}</li>;
+            })}
+          </FilterContainer>
+        </Sidebar>
+      )}
       <StyledPostContainer>
         {data && data.posts && data.posts.edges ? (
           <Posts
@@ -128,6 +114,38 @@ const Container = styled.main`
     align-items: center;
     justify-content: space-between;
   }
+  .header-filter {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    background-color: ${props => props.theme.colors.white};
+    border: 1px solid ${props => props.theme.colors.white};
+    padding: 5px;
+    border-radius: 5px;
+    .searchInput {
+      position: relative;
+      display: flex;
+      flex-direction: row;
+      .icon {
+        min-width: 30px;
+        height: 100%;
+        position: relative;
+        svg {
+          position: absolute;
+          display: inline-block;
+          stroke: ${props => props.theme.colors.dark};
+        }
+      }
+
+      input {
+        outline: none;
+        border: none;
+        background-color: ${props => props.theme.colors.lightGrey};
+        border-radius: 5px;
+        padding: 5px;
+      }
+    }
+  }
 `;
 const Card = styled.div`
   display: flex;
@@ -145,6 +163,14 @@ const Card = styled.div`
     margin-right: 2%;
   }
 `;
-const StyledPostContainer = styled.div``;
+const StyledPostContainer = styled.div`
+  margin: 20px 0;
+`;
+
+const FilterContainer = styled.div`
+  display: flex;
+  flex-direction: column;
+  padding: 5%;
+`;
 
 export default Feed;

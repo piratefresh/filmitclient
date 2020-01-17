@@ -6,6 +6,7 @@ import { setAccessToken } from "../accessToken";
 
 import { Input } from "../components/form/Input";
 import GoogleSignInBtn from "../components/buttons/GoogleBtn";
+import { AddButton } from "../components/buttons/buttons";
 import { SIGNIN_MUTATION } from "../graphql/mutations";
 import { GET_ME } from "../graphql/queries";
 
@@ -17,12 +18,7 @@ function Login({ history }) {
         history.push("/");
       }
     },
-    update(
-      cache,
-      {
-        data: { signIn }
-      }
-    ) {
+    update(cache, { data: { signIn } }) {
       // const { me } = cache.readQuery({ query: GET_ME });
       cache.writeQuery({
         query: GET_ME,
@@ -72,7 +68,10 @@ function Login({ history }) {
               onChange={formik.handleChange}
               value={formik.values.password}
             />
-            <input type="submit" />
+            <div className="form-buttons">
+              <AddButton type="submit">Login</AddButton>
+              <a href="/signup">Sign-up for an account</a>
+            </div>
           </form>
           <div className="button-container">
             <a href="/google">
@@ -112,10 +111,14 @@ const LoginContainer = styled.main`
   .login-wrapper {
     max-width: 580px;
     width: 100%;
+    .form-buttons {
+      display: flex;
+      justify-content: space-between;
+    }
     .button-container {
       width: 100%;
       max-width: 350px;
-      margin: 0 auto;
+      margin: 70px auto;
     }
   }
   .error-message {

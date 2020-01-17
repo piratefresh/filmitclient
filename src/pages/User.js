@@ -21,7 +21,14 @@ function User() {
     }
   });
   const [createChannel, { loading: createChannelLoading }] = useMutation(
-    CREATE_CHANNEL_MUTATION
+    CREATE_CHANNEL_MUTATION,
+    {
+      onCompleted({ createChannel }) {
+        if (createChannel) {
+          toggle();
+        }
+      }
+    }
   );
   const { isShown, toggle } = useModal();
   // Form

@@ -1,18 +1,12 @@
 import React from "react";
 import styled, { css } from "styled-components";
 import { useMutation } from "@apollo/react-hooks";
+import { SIGNUP_MUTATION } from "../graphql/mutations";
 import gql from "graphql-tag";
 import { useFormik } from "formik";
 import { Input } from "../components/form/Input";
+import { AddButton } from "../components/buttons/buttons";
 import GoogleSignInBtn from "../components/buttons/GoogleBtn";
-
-const SIGNUP_MUTATION = gql`
-  mutation signUp($username: String!, $email: String!, $password: String!) {
-    signUp(username: $username, email: $email, password: $password) {
-      accessToken
-    }
-  }
-`;
 
 function SignUp({ history }) {
   const [signUp, { loading }] = useMutation(SIGNUP_MUTATION, {
@@ -26,7 +20,9 @@ function SignUp({ history }) {
     initialValues: {
       username: "",
       email: "",
-      password: ""
+      password: "",
+      firstName: "",
+      lastName: ""
     },
     onSubmit: async (values, { setSubmitting, setStatus }) => {
       try {
@@ -53,8 +49,20 @@ function SignUp({ history }) {
           {!!formik.status && (
             <span className="error-message">{formik.status}</span>
           )}
-          <h2>Login</h2>
+          <h2>Sign-Up</h2>
           <form onSubmit={formik.handleSubmit}>
+            <Input
+              name="firstName"
+              placeholder="First Name"
+              onChange={formik.handleChange}
+              value={formik.values.firstName}
+            />
+            <Input
+              name="lastName"
+              placeholder="Last Name"
+              onChange={formik.handleChange}
+              value={formik.values.lastName}
+            />
             <Input
               name="username"
               placeholder="Username"
@@ -73,7 +81,10 @@ function SignUp({ history }) {
               onChange={formik.handleChange}
               value={formik.values.password}
             />
-            <input type="submit" />
+            <div className="form-buttons">
+              <AddButton type="submit">Create Account</AddButton>
+              <a href="/login">Have an account? Login</a>
+            </div>
           </form>
           <div className="button-container">
             <a href="/google">
@@ -113,10 +124,14 @@ const LoginContainer = styled.main`
   .login-wrapper {
     max-width: 580px;
     width: 100%;
+    .form-buttons {
+      display: flex;
+      justify-content: space-between;
+    }
     .button-container {
       width: 100%;
       max-width: 350px;
-      margin: 0 auto;
+      margin: 70px auto;
     }
   }
   .error-message {
