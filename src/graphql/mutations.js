@@ -165,14 +165,6 @@ export const CREATE_MESSAGE_MUTATION = gql`
   }
 `;
 
-// export const CREATE_CHANNEL_MUTATION = gql`
-//   mutation createChannel($receiverId: Int!, $content: String!) {
-//     createChannel(receiverId: $receiverId, content: $content) {
-//       id
-//     }
-//   }
-// `;
-
 export const CREATE_CHANNEL_MUTATION = gql`
   mutation createChannel($receiverId: Int, $content: String) {
     createChannel(receiverId: $receiverId, content: $content) {

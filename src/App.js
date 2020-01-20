@@ -26,7 +26,7 @@ import Messages from "./pages/Messages";
 import SignUp from "./pages/SignUp";
 import ConfirmEmail from "./pages/ConfirmEmail";
 import User from "./pages/User";
-import SearchFeed from "./pages/SearchFeed";
+import ElasticFeed from "./pages/ElasticFeed";
 import { TestSelect } from "./pages/testSelect";
 
 const GlobalStyle = createGlobalStyle`
@@ -102,8 +102,14 @@ function App() {
             <AppRoute exact path="/feed" component={Feed} layout={MainLayout} />
             <AppRoute
               exact
-              path="/feed/search/:query"
-              component={SearchFeed}
+              path="/feed/search/:category"
+              component={Feed}
+              layout={MainLayout}
+            />
+            <AppRoute
+              exact
+              path="/elasticfeed"
+              component={ElasticFeed}
               layout={MainLayout}
             />
             <PrivatRoute

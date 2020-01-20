@@ -132,6 +132,8 @@ export const GET_POSTS = gql`
         user {
           username
           email
+          firstName
+          lastName
         }
       }
       pageInfo {
@@ -143,8 +145,43 @@ export const GET_POSTS = gql`
 `;
 
 export const SEARCH_POSTS = gql`
-  query searchPosts($query: String!) {
-    searchPosts(query: $query) {
+  query searchPosts(
+    $term: String
+    $category: String
+    $offset: Int
+    $cursor: String
+  ) {
+    searchPosts(
+      term: $term
+      category: $category
+      limit: 4
+      offset: $offset
+      cursor: $cursor
+    ) {
+      edges {
+        id
+        text
+        title
+        createdAt
+        tags
+        location
+        category
+        postImage
+        username
+        firstName
+        lastName
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
+      }
+    }
+  }
+`;
+
+export const CATEGORY_POSTS = gql`
+  query categoryPosts($query: String!) {
+    categoryPosts(query: $query) {
       id
       title
       text

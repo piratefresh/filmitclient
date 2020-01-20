@@ -1,38 +1,64 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import styled from "styled-components";
+import { useParams, useLocation } from "react-router-dom";
 import { useQuery, useLazyQuery } from "@apollo/react-hooks";
 import { GET_POSTS, SEARCH_POSTS } from "../graphql/queries";
 import Posts from "../components/list/Posts";
 import { ErrorMessageContainer } from "../components/container";
 import Sidebar from "../components/menu/Sidebar";
 import useSidebar from "../components/hooks/useSidebar";
-import { useFormik } from "formik";
+import { useFormik, FormikProvider } from "formik";
 import Search from "../icons/Search";
 import { CATEGORIES } from "../components/data/constants";
+import CheckBox from "../components/form/Checkboxes";
+import queryString from "query-string";
 
 import { POST_CREATED } from "../graphql/subscription";
 import StyledLink from "../components/link/StyledLink";
 import { AddButton, SecondaryButton } from "../components/buttons/buttons";
+import {
+  Container,
+  FilterContainer,
+  StyledPostContainer
+} from "../components/container/Feed";
 
 function Feed({ history }) {
-  const {
-    loading,
-    error,
-    data,
-    subscribeToMore,
-    fetchMore,
-    updateQuery: updatePostsQuery
-  } = useQuery(GET_POSTS);
+  const { term, category } = useParams();
+  // const params = new URLSearchParams(location.search);
+  //   const term = params.get('find_desc');
+  //   const locationParam = params.get('find_loc');
+  let params = queryString.parse(useLocation().search);
+  const { loading, error, data, subscribeToMore, fetchMore } = useQuery(
+    GET_POSTS,
+    {
+      skip: Object.keys(params).length > 0 ? true : false
+    }
+  );
+
+  const [
+    searchPosts,
+    { loading: searchLoading, data: searchData, fetchMore: searchFetchMore }
+  ] = useLazyQuery(SEARCH_POSTS);
 
   const formik = useFormik({
     initialValues: {
-      query: ""
+      term: ""
     },
-    onSubmit: ({ query }) => {
-      if (query.length > 0) {
-        history.push(`/feed/search/${query}`);
+    onSubmit: ({ term }) => {
+      if (term.length > 0) {
+        // history.push(`/feed/search/${term}`);
+        searchPosts({
+          variables: {
+            term: params.term ? params.term : "",
+            category: params.category ? params.category : ""
+          }
+        });
       }
+    }
+  });
+
+  const formik2 = useFormik({
+    initialValues: {
+      category: ""
     }
   });
 
@@ -57,13 +83,27 @@ function Feed({ history }) {
     return () => unsubscribe();
   }, [subscribeToMore]);
 
-  const { isOpen, toggle } = useSidebar();
-  if (loading) return <div>loading..</div>;
+  // React.useEffect(() => {
+  //   if (params.category || params.term) {
+  //     searchPosts({
+  //       variables: {
+  //         query: params.term ? params.term : "",
+  //         category: params.category ? params.category : ""
+  //       }
+  //     });
+  //   }
+  // }, [params.category, params.term]);
 
+  const { isOpen, toggle } = useSidebar();
+  if (searchLoading) return <div>loading..</div>;
+
+  console.log(params);
   return (
     <Container>
       <div className="header">
         <h2>Feed</h2>
+        <span>{category}</span>
+        {/* <span>{queryString}</span> */}
         <StyledLink to="/createpost">
           <AddButton>Add Project</AddButton>
         </StyledLink>
@@ -75,11 +115,11 @@ function Feed({ history }) {
               <Search />
             </div>
             <input
-              name="query"
+              name="term"
               type="text"
               placeholder="Search jobs"
               onChange={formik.handleChange}
-              value={formik.values.query}
+              value={formik.values.term}
             />
           </div>
         </form>
@@ -89,16 +129,28 @@ function Feed({ history }) {
       {isOpen && (
         <Sidebar>
           <FilterContainer>
-            {CATEGORIES.map(notif => {
-              return <li>{notif.title}</li>;
-            })}
+            <FormikProvider value={formik2}>
+              <form onSubmit={formik2.handleSubmit}>
+                {CATEGORIES.map(notif => {
+                  return (
+                    <CheckBox
+                      name="category"
+                      notif={notif}
+                      key={notif.key}
+                      setFieldValue={formik2.setFieldValue}
+                    />
+                  );
+                })}
+                <AddButton>Update Feed</AddButton>
+              </form>
+            </FormikProvider>
           </FilterContainer>
         </Sidebar>
       )}
       <StyledPostContainer>
         {data && data.posts && data.posts.edges ? (
           <Posts
-            posts={data.posts.edges || []}
+            posts={data.posts.edges}
             onLoadMore={() =>
               fetchMore({
                 variables: {
@@ -120,6 +172,33 @@ function Feed({ history }) {
               })
             }
           ></Posts>
+        ) : searchData &&
+          searchData.searchPosts &&
+          searchData.searchPosts.edges ? (
+          <Posts
+            posts={searchData.searchPosts.edges}
+            onLoadMore={() =>
+              searchFetchMore({
+                variables: {
+                  query: "bobby",
+                  cursor: searchData.searchPosts.pageInfo.endCursor
+                },
+                updateQuery: (prevResult, { fetchMoreResult }) => {
+                  const newEdges = fetchMoreResult.searchPosts.edges;
+                  const pageInfo = fetchMoreResult.searchPosts.pageInfo;
+                  return newEdges.length
+                    ? {
+                        searchPosts: {
+                          __typename: prevResult.searchPosts.__typename,
+                          edges: [...prevResult.searchPosts.edges, ...newEdges],
+                          pageInfo
+                        }
+                      }
+                    : prevResult;
+                }
+              })
+            }
+          ></Posts>
         ) : (
           <ErrorMessageContainer>
             No Post Found
@@ -130,72 +209,5 @@ function Feed({ history }) {
     </Container>
   );
 }
-
-const Container = styled.main`
-  padding: 5%;
-  .header {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .header-filter {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    background-color: ${props => props.theme.colors.white};
-    border: 1px solid ${props => props.theme.colors.white};
-    padding: 5px;
-    border-radius: 5px;
-    .searchInput {
-      position: relative;
-      display: flex;
-      flex-direction: row;
-      .icon {
-        min-width: 30px;
-        height: 100%;
-        position: relative;
-        svg {
-          position: absolute;
-          display: inline-block;
-          stroke: ${props => props.theme.colors.dark};
-        }
-      }
-
-      input {
-        outline: none;
-        border: none;
-        background-color: ${props => props.theme.colors.lightGrey};
-        border-radius: 5px;
-        padding: 5px;
-      }
-    }
-  }
-`;
-const Card = styled.div`
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  background-color: #fff;
-  width: 90%;
-  height: 200px;
-  padding: 5%;
-  margin-bottom: 5%;
-  img {
-    min-width: 80px;
-    height: 60px;
-    object-fit: cover;
-    margin-right: 2%;
-  }
-`;
-const StyledPostContainer = styled.div`
-  margin: 20px 0;
-`;
-
-const FilterContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  padding: 5%;
-`;
 
 export default Feed;

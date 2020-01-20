@@ -19,14 +19,12 @@ import {
   StyledPostContainer
 } from "../components/container/Feed";
 
-function SearchFeed({ history }) {
-  let { query } = useParams();
-  const { called, loading, data, client } = useQuery(SEARCH_POSTS, {
+function CategoryFeed({ history }) {
+  let { category, term } = useParams();
+  const { called, loading, data } = useQuery(SEARCH_POSTS, {
     variables: {
-      query
-    },
-    onCompleted({ searchPosts }) {
-      client.writeData({ data: { posts: searchPosts } });
+      category,
+      term
     }
   });
 
@@ -99,8 +97,8 @@ function SearchFeed({ history }) {
         </Sidebar>
       )}
       <StyledPostContainer>
-        {data && data.posts ? (
-          <Posts posts={data.posts || []}></Posts>
+        {data && data.searchPosts ? (
+          <Posts posts={data.searchPosts || []}></Posts>
         ) : (
           <ErrorMessageContainer>
             No Post Found
@@ -112,4 +110,4 @@ function SearchFeed({ history }) {
   );
 }
 
-export default SearchFeed;
+export default CategoryFeed;
