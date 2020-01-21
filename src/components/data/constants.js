@@ -22,12 +22,12 @@ export const CATEGORIES = [
   {
     title: "Visual Effects",
     key: "vfx1",
-    value: "visual effects"
+    value: "visualeffects"
   },
   {
     title: "Music Production",
     key: "music",
-    value: "music production"
+    value: "musicproduction"
   },
   {
     title: "Marketing",

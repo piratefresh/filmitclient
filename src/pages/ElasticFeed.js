@@ -23,6 +23,10 @@ import {
 
 function ElasticFeed({ history }) {
   let params = queryString.parse(useLocation().search);
+  const [paramCat, setParamCat] = React.useState(
+    params.category ? [params.category] : null
+  );
+  const [paramTerm, setParamTerm] = React.useState(params.term);
   const [
     searchPosts,
     { loading, data, fetchMore, subscribeToMore }
@@ -34,13 +38,16 @@ function ElasticFeed({ history }) {
       category: []
     },
     onSubmit: ({ term, category }) => {
-      // history.push(`/feed/search/${term}`);
-      searchPosts({
-        variables: {
-          term: term ? term : "",
-          category: category ? category : ""
-        }
-      });
+      // Set the new queries into state and update the url
+      // useEffect below is dependent on paramTerm and paramCat
+      // Forces refetch of data everytime they change
+      setParamTerm(term);
+      setParamCat(category);
+      history.push(
+        `/elasticfeed?${term && "term=" + term}&${
+          category.length > 0 ? "category=" + category : ""
+        }`
+      );
     }
   });
 
@@ -65,10 +72,11 @@ function ElasticFeed({ history }) {
   }, [subscribeToMore]);
 
   React.useEffect(() => {
+    // Everytime term and cate queries get updated, fetch data
     searchPosts({
-      variables: { term: params.term, category: params.category }
+      variables: { term: paramTerm, category: paramCat }
     });
-  }, [params.term, params.category]);
+  }, [paramTerm, paramCat]);
 
   const { isOpen, toggle } = useSidebar();
   if (loading) return <div>loading..</div>;
@@ -127,7 +135,7 @@ function ElasticFeed({ history }) {
             onLoadMore={() =>
               fetchMore({
                 variables: {
-                  term: params.term,
+                  term: paramTerm,
                   cursor: data.searchPosts.pageInfo.endCursor
                 },
                 updateQuery: (prevResult, { fetchMoreResult }) => {
