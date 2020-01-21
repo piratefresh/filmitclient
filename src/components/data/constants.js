@@ -2,36 +2,36 @@ export const CATEGORIES = [
   {
     title: "Movie",
     key: "checkBox1",
-    value: "Movie"
+    value: "movie"
   },
   {
     title: "Production",
     key: "checkBox2",
-    value: "Production"
+    value: "production"
   },
   {
     title: "Development",
     key: "checkBox3",
-    value: "Development"
+    value: "development"
   },
   {
     title: "Graphic",
     key: "checkBox4",
-    value: "Graphic"
+    value: "graphic"
   },
   {
     title: "Visual Effects",
     key: "vfx1",
-    value: "Visual Effects"
+    value: "visual effects"
   },
   {
     title: "Music Production",
     key: "music",
-    value: "Music Production"
+    value: "music production"
   },
   {
     title: "Marketing",
     key: "Marketing2",
-    value: "Marketing"
+    value: "marketing"
   }
 ];

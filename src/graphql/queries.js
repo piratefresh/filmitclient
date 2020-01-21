@@ -147,7 +147,7 @@ export const GET_POSTS = gql`
 export const SEARCH_POSTS = gql`
   query searchPosts(
     $term: String
-    $category: String
+    $category: [String]
     $offset: Int
     $cursor: String
   ) {
