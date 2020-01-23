@@ -1,6 +1,8 @@
 import React from "react";
-import { Nav } from "../nav";
 import { MobileNav } from "../nav/MobileNav";
+import { Query } from "react-apollo";
+import { GET_ME } from "../../graphql/queries";
+import { useStateValue } from "../../contexts";
 
 import styled from "styled-components";
 
@@ -12,9 +14,13 @@ const Container = styled.div`
 
 export default ({ children }) => {
   return (
-    <Container>
-      <div className="inner-container">{children}</div>
-      <MobileNav />
-    </Container>
+    <Query query={GET_ME}>
+      {({ data, refetch }) => (
+        <Container>
+          <div className="inner-container">{children}</div>
+          <MobileNav session={data} refetch={refetch} />
+        </Container>
+      )}
+    </Query>
   );
 };

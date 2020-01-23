@@ -20,6 +20,7 @@ export const Container = styled.main`
       position: relative;
       display: flex;
       flex-direction: row;
+      width: 100%;
       .icon {
         min-width: 30px;
         height: 100%;
@@ -38,6 +39,7 @@ export const Container = styled.main`
         background-color: ${props => props.theme.colors.lightGrey};
         border-radius: 5px;
         padding: 5px;
+        width: 100%;
       }
     }
   }
@@ -48,10 +50,9 @@ export const StyledPostContainer = styled.div`
 `;
 
 export const FilterContainer = styled.div`
-  form {
-    display: flex;
-    flex-direction: column;
-    padding: 5%;
-    width: 100%;
-  }
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 5%;
+  width: 100%;
 `;

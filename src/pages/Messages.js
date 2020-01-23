@@ -1,83 +1,58 @@
 import React from "react";
 import { useQuery, useMutation } from "@apollo/react-hooks";
-import gql from "graphql-tag";
-import styled from "styled-components";
 import { useFormik } from "formik";
-import { GET_USERS, GET_ME, GET_CHANNELS } from "../graphql/queries";
+import { GET_CHANNELS } from "../graphql/queries";
+import { GET_LOCAL_ME } from "../graphql/localQueries";
 import { CREATE_MESSAGE_MUTATION } from "../graphql/mutations";
+import { MESSAGE_CREATED_SUBSCRIPTION } from "../graphql/subscription";
 import { MainContainer } from "../components/container";
-import AutoComplete from "../components/autoCompleter/hooks";
-import { Input } from "../components/form/BasicInput";
 import ChannelList from "../components/chat/ChannelList";
 
 function Messages() {
   const [searchValue, setSearchValue] = React.useState([]);
-  const { loading, error, data } = useQuery(GET_ME);
-  const { loading: userLoading, error: userError, data: userData } = useQuery(
-    GET_USERS
-  );
+  const { data } = useQuery(GET_LOCAL_ME);
   const {
     loading: channelsLoading,
     error: channelsError,
-    data: channelsData
-  } = useQuery(GET_CHANNELS);
+    data: channelsData,
+    refetch,
+    subscribeToMore
+  } = useQuery(GET_CHANNELS, { fetchPolicy: "cache-and-network" });
   const [createMessage, { loading: createMessageLoading }] = useMutation(
     CREATE_MESSAGE_MUTATION,
     {
       onCompleted({ createMessage }) {}
     }
   );
-  const formik = useFormik({
-    initialValues: {
-      userId: "",
-      receiverId: ""
-    },
-    onSubmit: async ({ userId, receiverId }, { setSubmitting, setStatus }) => {
-      createMessage({
-        variables: {
-          userId,
-          receiverId: searchValue
-        }
-      });
-    }
-  });
+
   React.useEffect(() => {
-    console.log(data);
-    if (data) {
-      formik.setFieldValue("userId", data.me.id);
-    }
-  }, [data]);
-  if (!userData) return <div>No User Data</div>;
+    const unsubscribe = subscribeToMore({
+      document: MESSAGE_CREATED_SUBSCRIPTION,
+      variables: {
+        receiverId: data && data.me ? parseInt(data.me.id, 10) : null
+      },
+      updateQuery: (previousResult, { subscriptionData }) => {
+        // If the subscription data does not exist
+        // Simply return the previous data
+        if (!subscriptionData.data) return channelsData;
+        const { channels } = refetch();
+        return channels;
+      }
+    });
+    return () => unsubscribe();
+  }, [subscribeToMore, data]);
 
   return (
     <MainContainer>
       <h2>Messages</h2>
-      {userData && (
-        <AutoComplete
-          data={userData}
-          setSearchValue={setSearchValue}
-          setFieldValue={formik.setFieldValue}
-        />
-      )}
-      {searchValue.id && (
-        <FormContainer>
-          <Input
-            name="text"
-            label="Text"
-            type="textarea"
-            // onChange={formik.handleChange}
-            // value={formik.values.text}
-            defaultValue
-          />
-        </FormContainer>
-      )}
-      {channelsData && channelsData.channels && channelsData.channels.edges && (
+      {channelsData &&
+      channelsData.channels &&
+      channelsData.channels.edges &&
+      data ? (
         <ChannelList channels={channelsData.channels.edges} me={data} />
-      )}
+      ) : null}
     </MainContainer>
   );
 }
-
-const FormContainer = styled.form``;
 
 export default Messages;

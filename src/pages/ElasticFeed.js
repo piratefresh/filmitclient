@@ -24,9 +24,11 @@ import {
 function ElasticFeed({ history }) {
   let params = queryString.parse(useLocation().search);
   const [paramCat, setParamCat] = React.useState(
-    params.category ? [params.category] : null
+    params.category ? [params.category] : []
   );
-  const [paramTerm, setParamTerm] = React.useState(params.term);
+  const [paramTerm, setParamTerm] = React.useState(
+    params.term ? params.term : ""
+  );
   const [
     searchPosts,
     { loading, data, fetchMore, subscribeToMore }
@@ -73,7 +75,7 @@ function ElasticFeed({ history }) {
 
   React.useEffect(() => {
     // Everytime term and cate queries get updated, fetch data
-    searchPosts({
+    return searchPosts({
       variables: { term: paramTerm, category: paramCat }
     });
   }, [paramTerm, paramCat]);

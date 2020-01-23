@@ -1,5 +1,7 @@
 import React from "react";
 import { useField, form } from "formik";
+import PropTypes from "prop-types";
+import styled from "styled-components";
 
 export function Checkbox(props) {
   // this will return field props for an <input />
@@ -7,7 +9,7 @@ export function Checkbox(props) {
   return (
     <>
       <label>
-        <input
+        <StyledCheckBox
           {...field}
           type="checkbox"
           checked={field.value.includes(props.value)}
@@ -28,3 +30,17 @@ export function Checkbox(props) {
     </>
   );
 }
+
+Checkbox.propTypes = {
+  type: PropTypes.string,
+  name: PropTypes.string.isRequired,
+  checked: PropTypes.bool,
+  onChange: PropTypes.func.isRequired
+};
+
+const StyledCheckBox = styled.input`
+  line-height: 40px;
+  margin: 10px 15px;
+  border-bottom: 1px solid ${props => props.theme.colors.primary};
+  outline: 1px solid ${props => props.theme.colors.primary};
+`;

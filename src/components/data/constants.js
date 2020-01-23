@@ -1,37 +1,47 @@
 export const CATEGORIES = [
   {
-    title: "Movie",
-    key: "checkBox1",
-    value: "movie"
+    title: "Art",
+    key: "art",
+    value: "art"
   },
   {
-    title: "Production",
-    key: "checkBox2",
-    value: "production"
+    title: "Addiotional Crew",
+    key: "addiotionalcrew",
+    value: "addiotionalcrew"
   },
   {
-    title: "Development",
-    key: "checkBox3",
-    value: "development"
+    title: "Camera",
+    key: "camera",
+    value: "camera"
   },
   {
-    title: "Graphic",
-    key: "checkBox4",
-    value: "graphic"
+    title: "Costume & Wardrobe",
+    key: "costumewardrobe",
+    value: "costumewardrobe"
+  },
+  {
+    title: "Pre-Production",
+    key: "preproduction",
+    value: "preproduction"
+  },
+  {
+    title: "Post-Production",
+    key: "postproduction",
+    value: "postproduction"
+  },
+  {
+    title: "Sound",
+    key: "sound",
+    value: "sound"
+  },
+  {
+    title: "Talent",
+    key: "talent",
+    value: "talent"
   },
   {
     title: "Visual Effects",
     key: "vfx1",
     value: "visualeffects"
-  },
-  {
-    title: "Music Production",
-    key: "music",
-    value: "musicproduction"
-  },
-  {
-    title: "Marketing",
-    key: "Marketing2",
-    value: "marketing"
   }
 ];

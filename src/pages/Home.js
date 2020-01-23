@@ -19,7 +19,6 @@ function Home() {
         userData.users.map((user, i) => {
           return <li key={i}>{user.username}</li>;
         })}
-      <UploadAvatar />
     </div>
   );
 }

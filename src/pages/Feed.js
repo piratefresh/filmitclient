@@ -75,7 +75,7 @@ function Feed({ history }) {
         return {
           posts: {
             ...previousResult.posts,
-            edges: [postCreated, ...previousResult.posts.edges]
+            edges: [postCreated.post, ...previousResult.posts.edges]
           }
         };
       }

@@ -12,7 +12,6 @@ import { onError } from "apollo-link-error";
 import { createHttpLink } from "apollo-link-http";
 import { WebSocketLink } from "apollo-link-ws";
 import { getMainDefinition } from "apollo-utilities";
-import { withClientState } from "apollo-link-state";
 import { TokenRefreshLink } from "apollo-link-token-refresh";
 import { ApolloProvider } from "@apollo/react-hooks";
 import { signOut } from "./components/SignOut";
@@ -49,7 +48,6 @@ const terminatingLink = split(
 const authLink = new ApolloLink((operation, forward) => {
   operation.setContext(({ headers = {} }) => {
     const accessToken = getAccessToken();
-    console.log("GETTING ACCESSTOKEN" + accessToken);
     if (accessToken) {
       headers = {
         ...headers,
@@ -109,7 +107,6 @@ const tokenRefreshLink = new TokenRefreshLink({
     });
   },
   handleFetch: accessToken => {
-    console.log("HANDLE FETCH" + accessToken);
     setAccessToken(accessToken);
   },
   handleError: err => {
@@ -120,27 +117,14 @@ const tokenRefreshLink = new TokenRefreshLink({
 
 const cache = new InMemoryCache();
 
-const initialState = {
-  posts: ["test"],
-  auth: "test"
-};
-
-// Creates local management link
-const stateLink = withClientState({
-  cache,
-  defaults: initialState,
-  resolvers
-});
-
 const link = ApolloLink.from([
-  stateLink,
   tokenRefreshLink,
   authLink,
   errorLink,
   terminatingLink
 ]);
 
-const client = new ApolloClient({ link, cache });
+const client = new ApolloClient({ link, cache, resolvers });
 
 const Root = () => (
   <ApolloProvider client={client}>

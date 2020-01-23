@@ -12,6 +12,7 @@ const Container = styled.div`
   height: 100%;
   background-color: ${props => props.theme.colors.white};
   margin-bottom: 20px;
+  width: 100%;
 `;
 
 export default Sidebar;

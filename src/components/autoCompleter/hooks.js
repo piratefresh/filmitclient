@@ -25,7 +25,7 @@ function renderSuggestion(suggestion, { query }) {
               : `http://localhost:8000/myAvatars/${suggestion.id}`
           }
           alt=""
-          srcset=""
+          srcSet=""
         />
         <span key={suggestion.id}>{suggestionText}</span>
       </span>
@@ -38,14 +38,17 @@ const AutoComplete = props => {
   const [suggestions, setSuggestions] = React.useState([]);
 
   function getSuggestionValue(suggestion) {
+    if (value.length == 0) {
+      console.log(value);
+    }
     props.setSearchValue(suggestion);
     props.setFieldValue("receiverId", suggestion);
     return `${suggestion.firstName} ${suggestion.lastName}`;
   }
 
-  const onChange = (event, { newValue, method }) => {
+  function onChange(event, { newValue, method }) {
     setValue(newValue);
-  };
+  }
 
   function getSuggestions(value, data) {
     const escapedValue = escapeRegexCharacters(value.trim());

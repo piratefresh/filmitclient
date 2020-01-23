@@ -11,5 +11,10 @@ export const resolvers = {
 
       return null;
     }
+  },
+  Query: {
+    getLocalMe: (me, _, { cache }) => {
+      // cache.readQuery;
+    }
   }
 };

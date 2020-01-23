@@ -62,7 +62,6 @@ const Image = styled.div`
 
   path {
     fill: ${props => props.theme.colors.lightGrey};
-npm 
   }
 `;
 

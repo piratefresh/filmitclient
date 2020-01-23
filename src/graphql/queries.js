@@ -206,6 +206,7 @@ export const GET_CHANNELS = gql`
         messages {
           id
           content
+          channelId
           receiverId {
             id
             username
@@ -220,6 +221,51 @@ export const GET_CHANNELS = gql`
             lastName
             avatar
           }
+        }
+      }
+    }
+  }
+`;
+
+export const GET_UNREAD_MESSAGES = gql`
+  query getUnreadMessages {
+    getUnreadMessages {
+      id
+      isRead
+      content
+      channelId
+      receiverId {
+        username
+      }
+      senderId {
+        username
+      }
+    }
+  }
+`;
+
+export const GET_CHANNEL = gql`
+  query getChannel($channelId: Int!) {
+    getChannel(channelId: $channelId) {
+      id
+      members
+      messages {
+        id
+        content
+        channelId
+        receiverId {
+          id
+          username
+          firstName
+          lastName
+          avatar
+        }
+        senderId {
+          id
+          username
+          firstName
+          lastName
+          avatar
         }
       }
     }

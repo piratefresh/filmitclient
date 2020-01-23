@@ -5,26 +5,51 @@ export const POST_CREATED = gql`
     postCreated {
       post {
         id
-        title
         text
-        tags
+        title
         createdAt
+        tags
+        location
         category
         postImage
-        location
+        user {
+          id
+          firstName
+          lastName
+          username
+          email
+        }
       }
     }
   }
 `;
 
 export const MESSAGE_CREATED_SUBSCRIPTION = gql`
-  subscription messageCreated($receiverId: Int!) {
+  subscription messageCreated($receiverId: Int) {
     messageCreated(receiverId: $receiverId) {
-      id
-      content
-      channelId
-      senderId
-      receiverId
+      message {
+        id
+        content
+        isRead
+        channelId
+        senderId {
+          username
+        }
+        receiverId {
+          username
+        }
+      }
+    }
+  }
+`;
+
+export const CHANNEL_UPDATED_SUBSCRIPTION = gql`
+  subscription channelUpdated($memberId: Int) {
+    channelUpdated(memberId: $memberId) {
+      channel {
+        id
+        members
+      }
     }
   }
 `;
