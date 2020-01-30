@@ -78,7 +78,9 @@ export const UPDATE_PROFILE_MUTATION = gql`
     $avatar: String
     $firstName: String
     $lastName: String
-    $location: String
+    $city: String
+    $lat: Float
+    $lon: Float
     $vimeo: String
     $youtube: String
     $linkedin: String
@@ -94,7 +96,9 @@ export const UPDATE_PROFILE_MUTATION = gql`
       avatar: $avatar
       firstName: $firstName
       lastName: $lastName
-      location: $location
+      city: $city
+      lat: $lat
+      lon: $lon
       facebook: $facebook
       linkedin: $linkedin
       youtube: $youtube
@@ -104,17 +108,30 @@ export const UPDATE_PROFILE_MUTATION = gql`
       id
       username
       email
-      homepage
       bio
+      homepage
+      role
       avatar
       firstName
       lastName
-      location
-      vimeo
+      city
+      lat
+      lon
+      instagram
+      youtube
       facebook
       linkedin
-      youtube
-      instagram
+      vimeo
+      posts {
+        id
+        text
+        title
+        createdAt
+        tags
+        city
+        category
+        postImage
+      }
     }
   }
 `;
@@ -124,8 +141,8 @@ export const CREATE_POST_MUTATION = gql`
     $text: String!
     $title: String!
     $postImage: String!
-    $location: String!
-    $lng: Float!
+    $city: String!
+    $lon: Float!
     $lat: Float!
     $tags: [String!]
     $category: [String!]
@@ -136,18 +153,18 @@ export const CREATE_POST_MUTATION = gql`
       postImage: $postImage
       tags: $tags
       category: $category
-      location: $location
+      city: $city
       lat: $lat
-      lng: $lng
+      lon: $lon
     ) {
       title
       text
       postImage
       category
       tags
-      location
+      city
       lat
-      lng
+      lon
     }
   }
 `;
@@ -160,6 +177,8 @@ export const CREATE_MESSAGE_MUTATION = gql`
       receiverId {
         firstName
         lastName
+        username
+        id
       }
     }
   }
@@ -170,5 +189,11 @@ export const CREATE_CHANNEL_MUTATION = gql`
     createChannel(receiverId: $receiverId, content: $content) {
       id
     }
+  }
+`;
+
+export const UPDATE_MESSAGE_SEEN = gql`
+  mutation updateMessageSeen($senderId: ID!, $channelId: ID!) {
+    updateMessageSeen(senderId: $senderId, channelId: $channelId)
   }
 `;

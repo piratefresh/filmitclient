@@ -1,3 +1,4 @@
+/*global google*/
 import React from "react";
 import { useLocation } from "react-router-dom";
 import { useLazyQuery } from "@apollo/react-hooks";
@@ -6,12 +7,15 @@ import Posts from "../components/list/Posts";
 import { ErrorMessageContainer } from "../components/container";
 import Sidebar from "../components/menu/Sidebar";
 import useSidebar from "../components/hooks/useSidebar";
+import { usePosition } from "../components/hooks/usePosition";
 import { useFormik, FormikProvider } from "formik";
 import Search from "../icons/Search";
 import { CATEGORIES } from "../components/data/constants";
 import { Checkbox } from "../components/form/Checkbox";
 import queryString from "query-string";
-
+import Geosuggest from "react-geosuggest";
+import { useStateValue } from "../contexts/";
+import { validateCategory, validateLatLon } from "../utils/isEmpty";
 import { POST_CREATED } from "../graphql/subscription";
 import StyledLink from "../components/link/StyledLink";
 import { AddButton, SecondaryButton } from "../components/buttons/buttons";
@@ -22,13 +26,15 @@ import {
 } from "../components/container/Feed";
 
 function ElasticFeed({ history }) {
+  const [{ location }, dispatch] = useStateValue();
   let params = queryString.parse(useLocation().search);
-  const [paramCat, setParamCat] = React.useState(
-    params.category ? [params.category] : []
-  );
-  const [paramTerm, setParamTerm] = React.useState(
-    params.term ? params.term : ""
-  );
+  const { latitude, longitude } = usePosition();
+  const [state, setState] = React.useState({
+    term: params.term ? params.term : "",
+    lat: latitude ? latitude : parseFloat(params.lat),
+    lon: longitude ? longitude : parseFloat(params.lon),
+    category: params.category ? [params.category] : []
+  });
   const [
     searchPosts,
     { loading, data, fetchMore, subscribeToMore }
@@ -37,17 +43,27 @@ function ElasticFeed({ history }) {
   const formik = useFormik({
     initialValues: {
       term: "",
-      category: []
+      category: "",
+      lat: state.lat ? state.lat : null,
+      lon: state.lon ? state.lon : null
     },
-    onSubmit: ({ term, category }) => {
+    onSubmit: async ({ term, category, lat, lon }) => {
       // Set the new queries into state and update the url
       // useEffect below is dependent on paramTerm and paramCat
       // Forces refetch of data everytime they change
-      setParamTerm(term);
-      setParamCat(category);
+      await setState({
+        term,
+        category: category ? category : "",
+        lat: lat ? lat : state.lat,
+        lon: lon ? lon : state.lon
+      });
       history.push(
-        `/elasticfeed?${term && "term=" + term}&${
-          category.length > 0 ? "category=" + category : ""
+        `/elasticfeed?${term && "term=" + term}${
+          validateCategory(category) ? "&category=" + category : ""
+        }${
+          !validateLatLon(state.lat, state.lon)
+            ? "loc=" + state.lat + state.lon
+            : ""
         }`
       );
     }
@@ -62,10 +78,12 @@ function ElasticFeed({ history }) {
           // Simply return the previous data
           if (!subscriptionData.data) return previousResult;
           const { postCreated } = subscriptionData.data;
+          if (postCreated === null) return previousResult;
           return {
-            posts: {
-              ...previousResult.searchPosts,
-              edges: [postCreated, ...previousResult.searchPosts.edges]
+            searchPosts: {
+              __typename: previousResult.searchPosts.__typename,
+              edges: [postCreated, ...previousResult.searchPosts.edges],
+              pageInfo: previousResult.searchPosts.pageInfo
             }
           };
         }
@@ -74,11 +92,44 @@ function ElasticFeed({ history }) {
   }, [subscribeToMore]);
 
   React.useEffect(() => {
-    // Everytime term and cate queries get updated, fetch data
-    return searchPosts({
-      variables: { term: paramTerm, category: paramCat }
+    setState(prevState => ({
+      ...prevState,
+      lat: latitude,
+      lon: longitude
+    }));
+    dispatch({
+      type: "changeLocation",
+      newLocation: { lat: latitude, lon: longitude }
     });
-  }, [paramTerm, paramCat]);
+  }, [latitude, longitude]);
+
+  React.useEffect(() => {
+    // Everytime term and cate queries get updated, fetch data
+    console.log(state.lat);
+    return searchPosts({
+      variables: {
+        term: state.term,
+        category: state.category ? state.category : "",
+        lat: state.lat,
+        lon: state.lon
+      }
+    });
+  }, [searchPosts, state.lon, state.lat, state.term, state.category]);
+
+  function onSuggestSelect(suggest) {
+    if (suggest) {
+      const {
+        location: { lat, lng },
+        label
+      } = suggest;
+      formik.setValues({
+        ...formik.values,
+        lat: lat,
+        lon: lng,
+        location: label
+      });
+    }
+  }
 
   const { isOpen, toggle } = useSidebar();
   if (loading) return <div>loading..</div>;
@@ -124,7 +175,22 @@ function ElasticFeed({ history }) {
                     />
                   );
                 })}
+                <Geosuggest
+                  onSuggestSelect={onSuggestSelect}
+                  // onSuggestNoResults={onSuggestNoResults}
+                  placeholder="City or Zip"
+                  location={
+                    new google.maps.LatLng(
+                      latitude ? latitude : 53.558572,
+                      longitude ? longitude : 9.9278215
+                    )
+                  }
+                  types={["(regions)"]}
+                  country={["us", "ca"]}
+                  radius={20}
+                />
               </FilterContainer>
+
               <button type="submit">Update Feed</button>
             </Sidebar>
           )}
@@ -137,7 +203,9 @@ function ElasticFeed({ history }) {
             onLoadMore={() =>
               fetchMore({
                 variables: {
-                  term: paramTerm,
+                  term: state.term,
+                  lat: state.lat,
+                  lon: state.lon,
                   cursor: data.searchPosts.pageInfo.endCursor
                 },
                 updateQuery: (prevResult, { fetchMoreResult }) => {

@@ -5,12 +5,24 @@ export const GET_LOCAL_ME = gql`
     me @client {
       id
       username
-      email
-      bio
       role
       avatar
       firstName
       lastName
+      unreadMessages {
+        id
+        content
+        isRead
+        channelId
+        receiverId {
+          id
+          username
+        }
+        senderId {
+          id
+          username
+        }
+      }
     }
   }
 `;
@@ -23,10 +35,16 @@ export const GET_LOCAL_UNREAD_MESSAGES = gql`
       isRead
       content
       receiverId {
+        id
         username
+        firstName
+        lastName
       }
       senderId {
+        id
         username
+        firstName
+        lastName
       }
     }
   }

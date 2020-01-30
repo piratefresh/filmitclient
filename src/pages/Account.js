@@ -26,7 +26,7 @@ const AccountPage = ({ history }) => {
   React.useEffect(() => {
     setImage(data.me.avatar ? data.me.avatar : image);
     formik.setFieldValue("avatar", image);
-  }, [image]);
+  }, [image, data.me.avatar]);
   const [updateProfile, { loading: updateProfileLoading }] = useMutation(
     UPDATE_PROFILE_MUTATION,
     {
@@ -47,9 +47,9 @@ const AccountPage = ({ history }) => {
       firstName: data.me.firstName,
       lastName: data.me.lastName,
       email: data.me.email,
-      location: data.me.location,
+      city: data.me.city,
       lat: data.me.lat,
-      lng: data.me.lng,
+      lon: data.me.lon,
       homepage: data.me.homepage ? data.me.homepage : "",
       bio: data.me.bio ? data.me.bio : "",
       avatar: data.me.avatar ? data.me.avatar : "",
@@ -71,9 +71,9 @@ const AccountPage = ({ history }) => {
         avatar,
         firstName,
         lastName,
-        location,
+        city,
         lat,
-        lng,
+        lon,
         facebook,
         instagram,
         linkedin,
@@ -91,9 +91,9 @@ const AccountPage = ({ history }) => {
           avatar: image,
           firstName,
           lastName,
-          location,
+          city,
           lat,
-          lng,
+          lon,
           facebook,
           instagram,
           linkedin,
@@ -122,8 +122,8 @@ const AccountPage = ({ history }) => {
       formik.setValues({
         ...formik.values,
         lat,
-        lng,
-        location: label
+        lon: lng,
+        city: label
       });
     }
   }
@@ -197,7 +197,7 @@ const AccountPage = ({ history }) => {
         <Geosuggest
           onSuggestSelect={onSuggestSelect}
           placeholder="City or Zip"
-          initialValue={data.me.location ? data.me.location : "test"}
+          initialValue={data.me.city ? data.me.city : "test"}
           location={new google.maps.LatLng(53.558572, 9.9278215)}
           types={["(regions)"]}
           country={["us", "ca"]}

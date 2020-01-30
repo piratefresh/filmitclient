@@ -2,10 +2,6 @@ import React from "react";
 import styled from "styled-components";
 import StyledNavLink from "../link/StyledNavLink";
 import { useQuery } from "@apollo/react-hooks";
-import {
-  GET_LOCAL_ME,
-  GET_LOCAL_UNREAD_MESSAGES
-} from "../../graphql/localQueries";
 import { GET_UNREAD_MESSAGES, GET_ME } from "../../graphql/queries";
 import {
   MESSAGE_CREATED_SUBSCRIPTION,
@@ -19,47 +15,37 @@ import Messages from "../../icons/Messages";
 import Login from "../../icons/Login";
 
 export function MobileNav({ session }) {
-  const { loading, error, data, subscribeToMore, client, refetch } = useQuery(
-    GET_UNREAD_MESSAGES
-  );
+  const { loading, error, data, subscribeToMore } = useQuery(GET_ME);
+  const [counter, setCounter] = React.useState();
 
+  // gets message notifications
   React.useEffect(() => {
-    const unsubscribeNewMessage = subscribeToMore({
+    const unsubscribe = subscribeToMore({
       document: MESSAGE_CREATED_SUBSCRIPTION,
-      variables: {
-        receiverId: session && session.me ? parseInt(session.me.id, 10) : null
-      },
-      updateQuery: (previousResult, { subscriptionData }) => {
-        const { getUnreadMessages } = client.readQuery({
-          query: GET_LOCAL_UNREAD_MESSAGES
-        });
-        if (!subscriptionData.data) return previousResult;
+      updateQuery: (prev, { subscriptionData }) => {
+        if (!subscriptionData.data) return prev;
+        const oldUnreadMessages = prev.me.unreadMessages;
         const { messageCreated } = subscriptionData.data;
-        return {
-          getUnreadMessages: [...getUnreadMessages, messageCreated.message]
-        };
+
+        // Merge conversations
+        const mergeConversations = [...oldUnreadMessages, messageCreated];
+
+        const me = prev.me;
+        me.unreadMessages = mergeConversations;
+        setCounter(me.unreadMessages.length);
+        console.log(me);
+
+        return { me };
       }
     });
-    const unsubscribeUpdateChannel = subscribeToMore({
-      document: CHANNEL_UPDATED_SUBSCRIPTION,
-      variables: {
-        memberId: session && session.me ? parseInt(session.me.id, 10) : null
-      },
-      updateQuery: async (previousResult, { subscriptionData }) => {
-        if (!subscriptionData.data) return previousResult;
-        console.log("channel updated");
-        const { getUnreadMessages } = await refetch();
-        return getUnreadMessages === undefined ? null : getUnreadMessages;
-      }
-    });
-    return function unsubscribe() {
-      unsubscribeNewMessage();
-      unsubscribeUpdateChannel();
+
+    return () => {
+      unsubscribe();
     };
-  }, [subscribeToMore, session]);
+  }, [subscribeToMore]);
 
   if (loading) return <div>loading notify..</div>;
-
+  if (error) return console.log(error);
   return (
     <NavStyled>
       <ul>
@@ -78,23 +64,23 @@ export function MobileNav({ session }) {
         <StyledNavLink to="/messages" my={2}>
           <Messages />
           <div>Messages</div>
-          {data && data.getUnreadMessages.length > 0 ? (
+          {data && data.me && data.me.unreadMessages.length > 0 ? (
             <div className="notification-counter">
-              {data.getUnreadMessages.length}
+              {data.me.unreadMessages.length}
             </div>
           ) : null}
         </StyledNavLink>
-        {session && session.me ? (
+        {data && data.me ? (
           <StyledNavLink to="/account" my={2}>
             <img
               src={
-                session.me.avatar
-                  ? session.me.avatar
-                  : `http://localhost:8000/myAvatars/${session.me.id}`
+                data.me.avatar
+                  ? data.me.avatar
+                  : `http://localhost:8000/myAvatars/${data.me.id}`
               }
-              alt={`Avatar for ${session.me.email}`}
+              alt={`Avatar for ${data.me.email}`}
             />
-            <div>{session.me.username}</div>
+            <div>{data.me.username}</div>
           </StyledNavLink>
         ) : (
           <StyledNavLink to="/login" my={2}>

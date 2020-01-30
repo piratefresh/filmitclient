@@ -2,41 +2,74 @@
 import React from "react";
 import styled from "styled-components";
 import { useFormik, FormikProvider } from "formik";
-import { useMutation } from "@apollo/react-hooks";
+import { useMutation, useQuery } from "@apollo/react-hooks";
 import { CREATE_POST_MUTATION } from "../graphql/mutations";
 import { CATEGORIES } from "../components/data/constants";
 import { Input } from "../components/form/BasicInput";
 import { UploadImage } from "../components/upload/ImageUpload";
 import "../styles/geosuggest.css";
 import Geosuggest, { Suggest } from "react-geosuggest";
+import { useStateValue } from "../contexts";
 import CheckBox from "../components/form/Checkboxes";
-import { GET_POSTS } from "../graphql/queries";
+import { SEARCH_POSTS } from "../graphql/queries";
+import { GET_LOCAL_ME } from "../graphql/localQueries";
 import { MainContainer } from "../components/container";
 import PlusIcon from "../icons/Plus";
 import { AddButton } from "../components/buttons/buttons";
 
 const CreatePost = ({ history }) => {
+  const [{ location }] = useStateValue();
   const [fields, setFields] = React.useState([{ value: null }]);
   const [image, setImage] = React.useState();
   const [largeImage, setLargeImage] = React.useState();
+  const { data: meData } = useQuery(GET_LOCAL_ME);
   const [createPost, { loading }] = useMutation(CREATE_POST_MUTATION, {
     onCompleted({ createPost }) {
       if (createPost.title) {
         history.push("/feed");
       }
     },
-    update(cache, { data: { createPost } }) {
-      let posts = [];
+    async update(client, { data }) {
+      // Complicated because of elasticsearch DB
       try {
-        const data = cache.readQuery({ query: GET_POSTS });
-        posts = data.posts.edges;
+        const { searchPosts } = await client.readQuery({
+          variables: {
+            term: "",
+            category: [],
+            lat: location.lat,
+            lon: location.lon
+          },
+          awaitRefetchQueries: true,
+          query: SEARCH_POSTS
+        });
+        const newData = {
+          ...data.createPost,
+          id: parseInt(searchPosts.edges[0].id, 10) + 1,
+          createdAt: new Date().toISOString(),
+          username: meData.me.username,
+          firstName: meData.me.firstName,
+          lastName: meData.me.lastName,
+          __typename: searchPosts.edges[0].__typename
+        };
+        client.writeQuery({
+          query: SEARCH_POSTS,
+          variables: {
+            term: "",
+            category: [],
+            lat: location.lat,
+            lon: location.lon
+          },
+          data: {
+            searchPosts: {
+              edges: [newData, ...searchPosts.edges],
+              pageInfo: searchPosts.pageInfo,
+              __typename: searchPosts.__typename
+            }
+          }
+        });
       } catch (err) {
         console.log(err);
       }
-      cache.writeQuery({
-        query: GET_POSTS,
-        data: { posts: [...posts, createPost] }
-      });
     }
   });
   const formik = useFormik({
@@ -46,12 +79,12 @@ const CreatePost = ({ history }) => {
       category: [],
       tagsObj: "",
       postImage: "",
-      location: "",
+      city: "",
       lat: "",
-      lng: ""
+      lon: ""
     },
     onSubmit: async (
-      { title, text, category, tagsObj, postImage, location, lat, lng },
+      { title, text, category, tagsObj, postImage, city, lat, lon },
       { setSubmitting, setStatus }
     ) => {
       var tags = tagsObj.map(tag => tag.value);
@@ -62,9 +95,9 @@ const CreatePost = ({ history }) => {
           category,
           tags,
           postImage,
-          location,
+          city,
           lat,
-          lng
+          lon
         }
       });
     }
@@ -110,8 +143,8 @@ const CreatePost = ({ history }) => {
       formik.setValues({
         ...formik.values,
         lat,
-        lng,
-        location: label
+        lon: lng,
+        city: label
       });
     }
   }

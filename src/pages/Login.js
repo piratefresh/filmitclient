@@ -3,7 +3,6 @@ import styled, { css } from "styled-components";
 import { useMutation } from "@apollo/react-hooks";
 import { useFormik } from "formik";
 import { setAccessToken } from "../accessToken";
-import { useStateValue } from "../contexts";
 
 import { Input } from "../components/form/Input";
 import GoogleSignInBtn from "../components/buttons/GoogleBtn";
@@ -12,19 +11,15 @@ import { SIGNIN_MUTATION } from "../graphql/mutations";
 import { GET_ME } from "../graphql/queries";
 
 function Login({ history }) {
-  const [{ me }, dispatch] = useStateValue();
   const [signIn, { loading }] = useMutation(SIGNIN_MUTATION, {
     onCompleted({ signIn }) {
       if (signIn.accessToken) {
         setAccessToken(signIn.accessToken);
-        dispatch({
-          type: "loggedin",
-          newLogin: { me: signIn.user }
-        });
         history.push("/");
       }
     },
     update(cache, { data: { signIn } }) {
+      // const { me } = cache.readQuery({ query: GET_ME });
       cache.writeQuery({
         query: GET_ME,
         data: { me: signIn.user }
@@ -112,7 +107,6 @@ const LoginContainer = styled.main`
   min-height: 100vh;
   justify-content: center;
   align-items: center;
-
   .login-wrapper {
     max-width: 580px;
     width: 100%;

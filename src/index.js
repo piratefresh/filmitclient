@@ -4,7 +4,6 @@ import "./index.css";
 import App from "./App";
 import { Normalize } from "styled-normalize";
 import * as serviceWorker from "./serviceWorker";
-
 import { ApolloClient } from "apollo-client";
 import { InMemoryCache } from "apollo-cache-inmemory";
 import { ApolloLink, split } from "apollo-link";
@@ -32,7 +31,14 @@ const httpLink = createHttpLink({
 const wsLink = new WebSocketLink({
   uri: `ws://localhost:8000/graphql`,
   options: {
-    reconnect: true
+    reconnect: true,
+    connectionParams: () => {
+      let accessToken = getAccessToken();
+      return {
+        authorization: accessToken,
+        test: "test"
+      };
+    }
   }
 });
 
@@ -54,7 +60,6 @@ const authLink = new ApolloLink((operation, forward) => {
         authorization: accessToken ? `Bearer ${accessToken}` : ""
       };
     }
-
     return { headers };
   });
 

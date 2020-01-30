@@ -53,7 +53,7 @@ function User() {
       formik.setFieldValue("receiverId", id);
       formik.setFieldValue("senderId", meData.me.id);
     }
-  }, [isShown]);
+  }, [isShown, id, meData]);
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
   const { user } = data;

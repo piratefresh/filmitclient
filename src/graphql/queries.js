@@ -5,6 +5,47 @@ export const GET_ME = gql`
     me {
       id
       username
+      role
+      email
+      avatar
+      bio
+      city
+      lat
+      lon
+      instagram
+      youtube
+      facebook
+      linkedin
+      vimeo
+      firstName
+      lastName
+      unreadMessages {
+        id
+        content
+        isRead
+        channelId
+        receiverId {
+          id
+          firstName
+          lastName
+          username
+        }
+        senderId {
+          id
+          firstName
+          lastName
+          username
+        }
+      }
+    }
+  }
+`;
+
+export const GET_USER_PROFILE = gql`
+  {
+    me {
+      id
+      username
       email
       bio
       homepage
@@ -12,7 +53,7 @@ export const GET_ME = gql`
       avatar
       firstName
       lastName
-      location
+      city
       instagram
       youtube
       facebook
@@ -89,7 +130,7 @@ export const GET_USER = gql`
         title
         createdAt
         tags
-        location
+        city
         category
         postImage
       }
@@ -105,7 +146,7 @@ export const GET_POST = gql`
       title
       createdAt
       tags
-      location
+      city
       category
       postImage
       user {
@@ -126,15 +167,12 @@ export const GET_POSTS = gql`
         title
         createdAt
         tags
-        location
+        city
         category
         postImage
-        user {
-          username
-          email
-          firstName
-          lastName
-        }
+        username
+        firstName
+        lastName
       }
       pageInfo {
         hasNextPage
@@ -148,12 +186,16 @@ export const SEARCH_POSTS = gql`
   query searchPosts(
     $term: String
     $category: [String]
+    $lat: Float
+    $lon: Float
     $offset: Int
     $cursor: String
   ) {
     searchPosts(
       term: $term
       category: $category
+      lat: $lat
+      lon: $lon
       limit: 4
       offset: $offset
       cursor: $cursor
@@ -164,7 +206,7 @@ export const SEARCH_POSTS = gql`
         title
         createdAt
         tags
-        location
+        city
         category
         postImage
         username
@@ -197,30 +239,40 @@ export const CATEGORY_POSTS = gql`
   }
 `;
 
-export const GET_CHANNELS = gql`
-  query channels {
-    channels {
-      edges {
+export const GET_USER_CHANNELS = gql`
+  query getUserChannels {
+    getUserChannels {
+      id
+      receiverId {
         id
-        members
-        messages {
+        firstName
+        lastName
+        username
+      }
+      senderId {
+        id
+        firstName
+        lastName
+        username
+      }
+      messages {
+        id
+        isRead
+        content
+        channelId
+        receiverId {
           id
-          content
-          channelId
-          receiverId {
-            id
-            username
-            firstName
-            lastName
-            avatar
-          }
-          senderId {
-            id
-            username
-            firstName
-            lastName
-            avatar
-          }
+          username
+          firstName
+          lastName
+          avatar
+        }
+        senderId {
+          id
+          username
+          firstName
+          lastName
+          avatar
         }
       }
     }
@@ -235,23 +287,29 @@ export const GET_UNREAD_MESSAGES = gql`
       content
       channelId
       receiverId {
+        id
         username
+        firstName
+        lastName
       }
       senderId {
+        id
         username
+        firstName
+        lastName
       }
     }
   }
 `;
 
 export const GET_CHANNEL = gql`
-  query getChannel($channelId: Int!) {
-    getChannel(channelId: $channelId) {
+  query channel($channelId: Int!) {
+    channel(channelId: $channelId) {
       id
-      members
       messages {
         id
         content
+        isRead
         channelId
         receiverId {
           id

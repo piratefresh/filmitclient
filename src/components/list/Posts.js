@@ -57,7 +57,7 @@ const Posts = ({ posts, onLoadMore }) => {
 
   React.useEffect(() => {
     if (fetch && onLoadMore) onLoadMore();
-  }, [fetch]);
+  }, [fetch, onLoadMore]);
 
   if (!posts) return <div>No Posts</div>;
   return (
@@ -80,7 +80,7 @@ const Posts = ({ posts, onLoadMore }) => {
                       <span className="post-active">Post is active</span>
                     )}
                   </div>
-                  <span className="post-location">{post.location}</span>
+                  <span className="post-location">{post.city}</span>
                   <span className="post-date">
                     {format(new Date(post.createdAt), "MMM dd")}
                   </span>

@@ -9,34 +9,72 @@ export const POST_CREATED = gql`
         title
         createdAt
         tags
-        location
+        city
         category
         postImage
-        user {
-          id
-          firstName
-          lastName
-          username
-          email
-        }
+        firstName
+        lastName
+        username
       }
     }
   }
 `;
 
 export const MESSAGE_CREATED_SUBSCRIPTION = gql`
-  subscription messageCreated($receiverId: Int) {
-    messageCreated(receiverId: $receiverId) {
-      message {
+  subscription messageCreated {
+    messageCreated {
+      id
+      content
+      isRead
+      channelId
+      senderId {
         id
-        content
+        username
+        firstName
+        lastName
+      }
+      receiverId {
+        id
+        username
+        firstName
+        lastName
+      }
+    }
+  }
+`;
+
+export const CHANNEL_NEW_SUBSCRIPTION = gql`
+  subscription channelNew {
+    channelNew {
+      id
+      createdAt
+      receiverId {
+        id
+        firstName
+        lastName
+        username
+      }
+      senderId {
+        id
+        firstName
+        lastName
+        username
+      }
+      messages {
+        id
         isRead
-        channelId
+        content
         senderId {
+          id
           username
+          firstName
+          lastName
         }
         receiverId {
+          id
           username
+          firstName
+          lastName
         }
       }
     }
@@ -44,12 +82,98 @@ export const MESSAGE_CREATED_SUBSCRIPTION = gql`
 `;
 
 export const CHANNEL_UPDATED_SUBSCRIPTION = gql`
-  subscription channelUpdated($memberId: Int) {
-    channelUpdated(memberId: $memberId) {
-      channel {
+  subscription channelUpdated {
+    channelUpdated {
+      id
+      receiverId {
         id
-        members
+        firstName
+        lastName
+        username
+      }
+      senderId {
+        id
+        firstName
+        lastName
+        username
+      }
+      createdAt
+      messages {
+        id
+        isRead
+        content
+        channelId
+        senderId {
+          id
+          username
+          firstName
+          lastName
+          avatar
+        }
+        receiverId {
+          id
+          username
+          firstName
+          lastName
+          avatar
+        }
       }
     }
   }
 `;
+
+export const GET_CHANNEL_SUBSCRIPTION = gql`
+  subscription getChannel($channelId: Int!) {
+    getChannel(channelId: $channelId) {
+      id
+      createdAt
+      receiverId {
+        id
+        username
+      }
+      senderId {
+        id
+        username
+      }
+      messages {
+        id
+        isRead
+        content
+        channelId
+        senderId {
+          id
+          username
+          firstName
+          lastName
+          avatar
+        }
+        receiverId {
+          id
+          username
+          firstName
+          lastName
+          avatar
+        }
+      }
+    }
+  }
+`;
+
+/**
+ * Get user's new conversation in real time
+ */
+// export const GET_NEW_CONVERSATIONS_SUBSCRIPTION = gql`
+//   subscription {
+//     newConversation {
+//       id
+//       username
+//       fullName
+//       image
+//       isOnline
+//       seen
+//       lastMessage
+//       lastMessageSender
+//       lastMessageCreatedAt
+//     }
+//   }
+// `;

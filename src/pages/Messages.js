@@ -1,56 +1,61 @@
 import React from "react";
 import { useQuery, useMutation } from "@apollo/react-hooks";
 import { useFormik } from "formik";
-import { GET_CHANNELS } from "../graphql/queries";
+import { GET_USER_CHANNELS } from "../graphql/queries";
 import { GET_LOCAL_ME } from "../graphql/localQueries";
 import { CREATE_MESSAGE_MUTATION } from "../graphql/mutations";
-import { MESSAGE_CREATED_SUBSCRIPTION } from "../graphql/subscription";
+import { CHANNEL_UPDATED_SUBSCRIPTION } from "../graphql/subscription";
 import { MainContainer } from "../components/container";
 import ChannelList from "../components/chat/ChannelList";
 
-function Messages() {
-  const [searchValue, setSearchValue] = React.useState([]);
-  const { data } = useQuery(GET_LOCAL_ME);
+function Messages({ session }) {
+  const { loading, data, error } = useQuery(GET_LOCAL_ME);
   const {
     loading: channelsLoading,
     error: channelsError,
     data: channelsData,
-    refetch,
     subscribeToMore
-  } = useQuery(GET_CHANNELS, { fetchPolicy: "cache-and-network" });
-  const [createMessage, { loading: createMessageLoading }] = useMutation(
-    CREATE_MESSAGE_MUTATION,
-    {
-      onCompleted({ createMessage }) {}
-    }
-  );
+  } = useQuery(GET_USER_CHANNELS, { fetchPolicy: "cache-and-network" });
 
   React.useEffect(() => {
     const unsubscribe = subscribeToMore({
-      document: MESSAGE_CREATED_SUBSCRIPTION,
-      variables: {
-        receiverId: data && data.me ? parseInt(data.me.id, 10) : null
-      },
+      document: CHANNEL_UPDATED_SUBSCRIPTION,
       updateQuery: (previousResult, { subscriptionData }) => {
         // If the subscription data does not exist
         // Simply return the previous data
         if (!subscriptionData.data) return channelsData;
-        const { channels } = refetch();
-        return channels;
+        const oldChannels = previousResult.getUserChannels;
+        const { channelUpdated } = subscriptionData.data;
+        // If authUser already has unseen message from that user,
+        // remove old message, so we can show the new one
+        const index = oldChannels.findIndex(u => u.id === channelUpdated.id);
+        if (index > -1) {
+          oldChannels.splice(index, 1);
+        }
+
+        // Merge channels
+        const mergeChannels = [channelUpdated, ...oldChannels];
+        console.log(mergeChannels);
+        return {
+          getUserChannels: mergeChannels
+        };
       }
     });
     return () => unsubscribe();
-  }, [subscribeToMore, data]);
+  }, [subscribeToMore, channelsData]);
+
+  if (channelsLoading) return <div>Loading...</div>;
+  if (loading) return <div>Loading...</div>;
+  if (error) console.log(error);
 
   return (
     <MainContainer>
       <h2>Messages</h2>
-      {channelsData &&
-      channelsData.channels &&
-      channelsData.channels.edges &&
-      data ? (
-        <ChannelList channels={channelsData.channels.edges} me={data} />
-      ) : null}
+      {channelsData && channelsData.getUserChannels && data && data.me
+        ? channelsData.getUserChannels.map(channel => {
+            return <ChannelList channel={channel} me={data} key={channel.id} />;
+          })
+        : null}
     </MainContainer>
   );
 }

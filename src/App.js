@@ -38,15 +38,15 @@ const GlobalStyle = createGlobalStyle`
 
 function App() {
   const initialState = {
-    me: {}
+    location: { lat: null, lan: null }
   };
 
   const reducer = (state, action) => {
     switch (action.type) {
-      case "loggedin":
+      case "changeLocation":
         return {
           ...state,
-          me: action.newLogin
+          location: action.newLocation
         };
 
       default:
