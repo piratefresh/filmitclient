@@ -1,18 +1,57 @@
 import React from "react";
 import styled from "styled-components";
 import { useParams } from "react-router-dom";
-import { useQuery } from "@apollo/react-hooks";
-import { GET_POST } from "../graphql/queries";
-
+import { useQuery, useMutation } from "@apollo/react-hooks";
+import { useFormik } from "formik";
+import { GET_POST, GET_ME } from "../graphql/queries";
+import { CREATE_CHANNEL_MUTATION } from "../graphql/mutations";
+import useModal from "../components/hooks/useModal";
+import Modal from "../components/modal";
 import { Avatar } from "../components/avatar";
+import { Input } from "../components/form/BasicInput";
+import { AddButton } from "../components/buttons/buttons";
 
 function Post() {
   let { id } = useParams();
+  const { isShown, toggle } = useModal();
+  const { loading: meLoading, error: meError, data: meData } = useQuery(GET_ME);
   const { loading, error, data } = useQuery(GET_POST, {
     variables: {
       id
     }
   });
+  const [createChannel, { loading: createChannelLoading }] = useMutation(
+    CREATE_CHANNEL_MUTATION,
+    {
+      onCompleted({ createChannel }) {
+        if (createChannel) {
+          toggle();
+        }
+      }
+    }
+  );
+  // Form
+  const formik = useFormik({
+    initialValues: {
+      receiverId: null,
+      content: ""
+    },
+    onSubmit: ({ receiverId, content }) => {
+      createChannel({
+        variables: {
+          receiverId: parseInt(receiverId, 10),
+          content
+        }
+      });
+    }
+  });
+  // Sets the hidden input with receiver id and sender id
+  React.useEffect(() => {
+    if (isShown && data && meData) {
+      formik.setFieldValue("receiverId", data.post.user.id);
+      formik.setFieldValue("senderId", meData.me.id);
+    }
+  }, [isShown, data, meData]);
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>{error}</div>;
@@ -23,7 +62,7 @@ function Post() {
       <div className="post-text-container">
         <div className="post-header">
           <h2 className="post-title">{post.title}</h2>
-          <span className="post-location">{post.location}</span>
+          <span className="post-location">{post.city}</span>
         </div>
 
         <div className="post-meta-details-container">
@@ -35,6 +74,23 @@ function Post() {
           <div className="post-meta-details">
             <div>{post.user.username}</div>
             <div>{post.user.email}</div>
+            <AddButton onClick={toggle}>Message</AddButton>
+            {isShown && (
+              <Modal content="Test" buttonLabel="Message" toggle={toggle}>
+                <h3>Send a message to {post.user.firstName}</h3>
+                <form onSubmit={formik.handleSubmit}>
+                  <input name="receiverId" type="hidden" />
+                  <input name="members" type="hidden" />
+                  <Input
+                    name="content"
+                    type="textarea"
+                    onChange={formik.handleChange}
+                    value={formik.values.content}
+                  />
+                  <AddButton type="submit">Message</AddButton>
+                </form>
+              </Modal>
+            )}
           </div>
         </div>
 

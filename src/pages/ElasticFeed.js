@@ -62,7 +62,7 @@ function ElasticFeed({ history }) {
           validateCategory(category) ? "&category=" + category : ""
         }${
           !validateLatLon(state.lat, state.lon)
-            ? "loc=" + state.lat + state.lon
+            ? "&loc=" + state.lat + state.lon
             : ""
         }`
       );
@@ -189,9 +189,8 @@ function ElasticFeed({ history }) {
                   country={["us", "ca"]}
                   radius={20}
                 />
+                <AddButton type="submit">Update Feed</AddButton>
               </FilterContainer>
-
-              <button type="submit">Update Feed</button>
             </Sidebar>
           )}
         </form>

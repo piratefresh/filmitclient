@@ -76,7 +76,7 @@ function User() {
               {user.firstName} {user.lastName}
             </div>
             <div>{user.email}</div>
-            <span className="user-location">{user.location}</span>
+            <span className="user-location">{user.city}</span>
           </div>
         </div>
         <AddButton onClick={toggle}>Message</AddButton>
@@ -144,11 +144,4 @@ const UserContainer = styled.div`
       white-space: pre-line;
     }
   }
-`;
-const HiddenForm = styled.form``;
-const ModalSeperator = styled.div`
-  color: ${props => props.theme.colors.primary};
-  border-bottom: 1px solid ${props => props.theme.colors.primary};
-  line-height: 2em;
-  margin-top: 75px;
 `;

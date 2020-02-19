@@ -19,6 +19,16 @@ export const GET_ME = gql`
       vimeo
       firstName
       lastName
+      posts {
+        id
+        text
+        title
+        createdAt
+        tags
+        city
+        category
+        postImage
+      }
       unreadMessages {
         id
         content
@@ -65,7 +75,7 @@ export const GET_USER_PROFILE = gql`
         title
         createdAt
         tags
-        location
+        city
         category
         postImage
       }
@@ -96,7 +106,7 @@ export const GET_QUERY_USERS = gql`
         avatar
         firstName
         lastName
-        location
+        city
       }
       pageInfo {
         hasNextPage
@@ -118,7 +128,7 @@ export const GET_USER = gql`
       avatar
       firstName
       lastName
-      location
+      city
       instagram
       youtube
       facebook
@@ -230,7 +240,25 @@ export const CATEGORY_POSTS = gql`
       username
       firstName
       lastName
-      location
+      city
+      tags
+      category
+      createdAt
+      postImage
+    }
+  }
+`;
+
+export const GET_RECENT_POSTS = gql`
+  query getRecentPosts {
+    getRecentPosts {
+      id
+      title
+      text
+      username
+      firstName
+      lastName
+      city
       tags
       category
       createdAt
